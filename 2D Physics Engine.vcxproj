@@ -84,6 +84,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,6 +114,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +144,7 @@
     <ClCompile Include="src\debug.ixx" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mesh.ixx" />
     <ClCompile Include="src\object.ixx" />
     <ClCompile Include="src\rendering.cpp" />
     <ClCompile Include="src\rendering.ixx" />

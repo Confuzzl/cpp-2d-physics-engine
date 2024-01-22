@@ -100,8 +100,6 @@ void Renderer::createShader(GLuint &ID, const std::string &name) {
 }
 
 struct FontVertex {
-  // GLfloat x, y;
-  // GLushort u, v;
   GLfloat pos[2];
   GLushort tex[2];
 
@@ -182,4 +180,15 @@ void Renderer::text(const std::string &str, const unsigned short x,
   glBindVertexArray(fontVAO);
 
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+}
+
+void Renderer::render(const Mesh &mesh) const {
+  // GLuint vbo =
+  for (const auto &vertex : mesh.data) {
+  }
+
+  glUseProgram(shapeShader);
+  glBindVertexArray(shapeVAO);
+
+  // glDrawElements
 }

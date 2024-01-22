@@ -33,6 +33,9 @@
     <ClCompile Include="src\debug.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\mesh.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl.h">

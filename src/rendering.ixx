@@ -7,6 +7,7 @@ export module rendering;
 import <string>;
 import <glm/glm.hpp>;
 import <glm/gtc/matrix_transform.hpp>;
+import mesh;
 
 export struct Renderer {
   static constexpr GLsizei WIDTH = 1280, HEIGHT = 720;
@@ -30,4 +31,5 @@ export struct Renderer {
 
   void text(const std::string &str, const unsigned short x = 0,
             const unsigned short y = 0) const;
+  void render(const Mesh &mesh) const;
 };
