@@ -1,26 +1,23 @@
 module;
 
 #include "gl.h"
-#include <format>
-#include <fstream>
-#include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include <iostream>
-
-#include <glm/gtc/type_ptr.hpp>
+#include <fstream>
 
 module rendering;
 
-import <glm/glm.hpp>;
-import debug;
+import <iostream>;
+import <format>;
+import <vector>;
 
-static std::string sourceToString(const std::string &name) {
-  std::ifstream in{name};
-  return {std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>()};
-}
+import glm;
+import debug;
+import vertices;
+import buffer_objects;
+import mesh;
 
 static const glm::lowp_u16vec2 QUAD_UVS[2][3]{{{0, 0}, {1, 0}, {1, 1}},
                                               {{0, 0}, {1, 1}, {0, 1}}};
@@ -28,25 +25,7 @@ static const glm::lowp_u16vec2 QUAD_UVS[2][3]{{{0, 0}, {1, 0}, {1, 1}},
 const glm::mat4 Renderer::UI_MATRIX{glm::ortho(
     0.0f, static_cast<float>(WIDTH), 0.0f, static_cast<float>(HEIGHT))};
 
-Renderer::Renderer() {
-  createShader(shapeShader, "shape");
-  glCreateVertexArrays(1, &shapeVAO);
-  glEnableVertexArrayAttrib(shapeVAO, 0);
-  glVertexArrayAttribFormat(shapeVAO, 0, 2, GL_FLOAT, false, 0);
-  glVertexArrayAttribBinding(shapeVAO, 0, 0);
-
-  createShader(fontShader, "font");
-  glCreateVertexArrays(1, &fontVAO);
-  glEnableVertexArrayAttrib(fontVAO, 0);
-  glVertexArrayAttribFormat(fontVAO, 0, 2, GL_FLOAT, false, 0);
-  glVertexArrayAttribBinding(fontVAO, 0, 0);
-  glEnableVertexArrayAttrib(fontVAO, 1);
-  glVertexArrayAttribFormat(fontVAO, 1, 2, GL_UNSIGNED_SHORT, false,
-                            2 * sizeof(GLfloat));
-  glVertexArrayAttribBinding(fontVAO, 1, 0);
-
-  initFontTexture();
-}
+Renderer::Renderer() { initFontTexture(); }
 
 void Renderer::initFontTexture() {
   glCreateTextures(GL_TEXTURE_2D, 1, &fontTexture);
@@ -66,47 +45,6 @@ void Renderer::initFontTexture() {
   stbi_image_free(data);
 }
 
-void Renderer::compileShader(const GLenum type, GLuint &ID,
-                             const std::string &source) {
-  GLint success = 0;
-  ID = glCreateShader(type);
-
-  std::string temp = sourceToString(source);
-  const char *chars = temp.c_str();
-  glShaderSource(ID, 1, &chars, NULL);
-
-  glCompileShader(ID);
-  glGetShaderiv(ID, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
-    println("COMPILATION ERROR {}", source);
-  }
-  println("{} {}", source, ID);
-}
-
-void Renderer::createShader(GLuint &ID, const std::string &name) {
-  ID = glCreateProgram();
-
-  GLuint vertID = 0, fragID = 0;
-  compileShader(GL_VERTEX_SHADER, vertID, std::format("assets/{}.vert", name));
-  compileShader(GL_FRAGMENT_SHADER, fragID,
-                std::format("assets/{}.frag", name));
-
-  glAttachShader(ID, vertID);
-  glAttachShader(ID, fragID);
-  glLinkProgram(ID);
-  glDeleteShader(vertID);
-  glDeleteShader(fragID);
-}
-
-struct FontVertex {
-  GLfloat pos[2];
-  GLushort tex[2];
-
-  FontVertex(GLfloat x, GLfloat y, GLushort u, GLushort v)
-      : pos{x, y}, tex{u, v} {}
-};
-
 static unsigned short charWidthConvert(const unsigned char w) {
   return static_cast<unsigned short>(
       static_cast<float>(w) * Renderer::CHAR_WIDTH / Renderer::FONT_WIDTH *
@@ -117,6 +55,8 @@ static unsigned short charHeightConvert(const unsigned char h) {
       static_cast<float>(h) * Renderer::CHAR_HEIGHT / Renderer::FONT_HEIGHT *
       Renderer::TEXEL_RANGE);
 }
+
+// import <glm/gtx/string_cast.hpp>;
 
 void Renderer::text(const std::string &str, const unsigned short x,
                     const unsigned short y) const {
@@ -129,10 +69,6 @@ void Renderer::text(const std::string &str, const unsigned short x,
   for (const char c : str) {
     const char id = c - 32;
     const unsigned char row = id / COLUMNS, column = id % COLUMNS;
-    // println("{} {}", row, column);
-    // println("{} {} {} {}", charWidthConvert(column),
-    //         charHeightConvert(ROWS - row), charWidthConvert(column + 1),
-    //         charHeightConvert(ROWS - (row + 1)));
 
     glm::vec4 uvInfo{column * CHAR_WIDTH, row * CHAR_HEIGHT, CHAR_WIDTH,
                      CHAR_HEIGHT};
@@ -147,48 +83,85 @@ void Renderer::text(const std::string &str, const unsigned short x,
       for (auto v = 0; v < 3; v++) {
         const glm::vec2 pos{xOffset + CHAR_WIDTH * QUAD_UVS[tri][v][0],
                             y + CHAR_HEIGHT * QUAD_UVS[tri][v][1]};
-        const glm::lowp_u16vec2 uv{/*uvCoordinates +
-                                   uvDimensions * */
-                                   QUAD_UVS[tri][v]};
+        const glm::lowp_u16vec2 uv = QUAD_UVS[tri][v];
         vertices.emplace_back(
             pos[0], pos[1],
             charWidthConvert(column) + uv[0] * charWidthConvert(1),
             charHeightConvert(ROWS - row - 1) + uv[1] * charHeightConvert(1));
+
+        println("{}", glm::to_string(UI_MATRIX * glm::vec4{pos, 0.0, 1.0}));
       }
     }
 
     xOffset += CHAR_WIDTH;
   }
 
-  GLuint vbo;
-  glCreateBuffers(1, &vbo);
-  glNamedBufferStorage(vbo, vertexCount * sizeof(FontVertex), NULL,
-                       GL_DYNAMIC_STORAGE_BIT);
+  VBO<FontVertex> vbo{vertexCount};
+
   GLintptr offset = 0;
   for (const auto &vertex : vertices) {
-    glNamedBufferSubData(vbo, offset, sizeof(vertex.pos), vertex.pos);
+    glNamedBufferSubData(vbo.ID, offset, sizeof(vertex.pos), vertex.pos);
     offset += sizeof(vertex.pos);
-    glNamedBufferSubData(vbo, offset, sizeof(vertex.tex), vertex.tex);
+    glNamedBufferSubData(vbo.ID, offset, sizeof(vertex.tex), vertex.tex);
     offset += sizeof(vertex.tex);
   }
-  glVertexArrayVertexBuffer(fontVAO, 0, vbo, 0, sizeof(FontVertex));
+  glVertexArrayVertexBuffer(fontShader.vao, 0, vbo.ID, 0, sizeof(FontVertex));
 
-  glUseProgram(fontShader);
-  glUniformMatrix4fv(glGetUniformLocation(fontShader, "projection"), 1,
-                     GL_FALSE, glm::value_ptr(UI_MATRIX));
+  glUseProgram(fontShader.ID);
+  fontShader.setProjection(UI_MATRIX);
+
   glBindTextureUnit(0, fontTexture);
-  glBindVertexArray(fontVAO);
+  glBindVertexArray(fontShader.vao);
 
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 }
 
-void Renderer::render(const Mesh &mesh) const {
-  // GLuint vbo =
-  for (const auto &vertex : mesh.data) {
+import scene;
+import object;
+
+void Renderer::render(const Object &object) const {
+  const Mesh &mesh = *object.mesh;
+
+  glUseProgram(shapeShader.ID);
+  glBindVertexArray(shapeShader.vao);
+  glVertexArrayElementBuffer(shapeShader.vao, mesh.ebo.ID);
+  glVertexArrayVertexBuffer(shapeShader.vao, 0, mesh.vbo.ID, 0,
+                            sizeof(ShapeVertex));
+
+  GLintptr offset = 0;
+  for (const ShapeVertex &vertex : mesh.localVertexData) {
+    glNamedBufferSubData(mesh.vbo.ID, offset, sizeof(vertex), vertex.pos);
+    offset += sizeof(vertex);
   }
+  shapeShader.setParentPos(object.pos);
+  shapeShader.setRotation(object.rotation);
+  shapeShader.setView(MAIN_SCENE.camera.getView());
 
-  glUseProgram(shapeShader);
-  glBindVertexArray(shapeVAO);
+  shapeShader.setFragColor(object.getColor());
 
-  // glDrawElements
+  glDrawElements(GL_TRIANGLES, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
+
+  // render(*object.collider.aabb, object.getColor());
+}
+
+import aabb;
+
+void Renderer::render(const AABB &aabb, const glm::uvec3 &color) const {
+  glUseProgram(shapeShader.ID);
+  glBindVertexArray(shapeShader.vao);
+  glVertexArrayVertexBuffer(shapeShader.vao, 0, aabb.vbo.ID, 0,
+                            sizeof(glm::vec2));
+
+  GLintptr offset = 0;
+  for (const glm::vec2 &vertex : aabb.corners()) {
+    glNamedBufferSubData(aabb.vbo.ID, offset, sizeof(vertex),
+                         glm::value_ptr(vertex));
+    offset += sizeof(vertex);
+  }
+  shapeShader.setParentPos(aabb.parent.globalPos());
+  shapeShader.setView(MAIN_SCENE.camera.getView());
+
+  shapeShader.setFragColor(color);
+
+  glDrawArrays(GL_LINE_LOOP, 0, 4);
 }

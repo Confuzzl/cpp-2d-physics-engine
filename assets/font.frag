@@ -4,10 +4,10 @@ in vec2 vertex_uv_out;
 out vec4 color;
 
 uniform sampler2D sampler;
-uniform vec4 font_color = vec4(1,1,1,1);
+uniform uvec3 font_color = uvec3(255, 255, 255);
 
 void main() {
-	vec4 col = texture(sampler, vertex_uv_out) * font_color;
+	const vec4 col = texture(sampler, vertex_uv_out) * vec4(font_color.x / 255.0, font_color.y / 255.0, font_color.z / 255.0, 1.0);
 	if (col.a == 0)
 		discard;
 	color = col;

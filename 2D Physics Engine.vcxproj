@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)Libraries\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Libraries\include;$(SolutionDir)src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -115,6 +115,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +132,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,13 +143,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\aabb.ixx" />
+    <ClCompile Include="src\buffer_objects.ixx" />
+    <ClCompile Include="src\collider.cpp" />
+    <ClCompile Include="src\collider.ixx" />
     <ClCompile Include="src\debug.ixx" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\glm.ixx" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mesh.ixx" />
+    <ClCompile Include="src\object.cpp" />
     <ClCompile Include="src\object.ixx" />
+    <ClCompile Include="src\poly.ixx" />
+    <ClCompile Include="src\math.ixx" />
     <ClCompile Include="src\rendering.cpp" />
     <ClCompile Include="src\rendering.ixx" />
+    <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\scene.ixx" />
+    <ClCompile Include="src\aabb.cpp" />
+    <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\shader.ixx" />
+    <ClCompile Include="src\vertices.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\gl.h" />

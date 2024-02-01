@@ -5,20 +5,24 @@ module;
 export module rendering;
 
 import <string>;
-import <glm/glm.hpp>;
-import <glm/gtc/matrix_transform.hpp>;
-import mesh;
+import glm;
+
+import shader;
+
+export struct Object;
+export struct AABB;
 
 export struct Renderer {
   static constexpr GLsizei WIDTH = 1280, HEIGHT = 720;
+  static constexpr float ASPECT_RATIO = static_cast<float>(WIDTH) / HEIGHT;
   static constexpr unsigned short TEXEL_RANGE = 1 << 15;
   static constexpr unsigned short FONT_WIDTH = 1024, FONT_HEIGHT = 1024;
   static constexpr unsigned char CHAR_WIDTH = 64, CHAR_HEIGHT = 128;
   static constexpr unsigned char COLUMNS = 16, ROWS = 8;
   static const glm::mat4 UI_MATRIX;
 
-  GLuint shapeShader = 0, fontShader = 0;
-  GLuint shapeVAO = 0, fontVAO = 0;
+  ShapeShader shapeShader{};
+  FontShader fontShader{};
 
   GLuint fontTexture = 0;
 
@@ -31,5 +35,6 @@ export struct Renderer {
 
   void text(const std::string &str, const unsigned short x = 0,
             const unsigned short y = 0) const;
-  void render(const Mesh &mesh) const;
+  void render(const Object &object) const;
+  void render(const AABB &aabb, const glm::uvec3 &color) const;
 };

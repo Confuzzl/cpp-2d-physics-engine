@@ -1,7 +1,12 @@
+#pragma once
 #include "gl.h"
 
 import rendering;
 import debug;
+import mesh;
+import object;
+import scene;
+import aabb;
 
 static void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id,
                                    GLenum severity, GLsizei length,
@@ -12,7 +17,15 @@ static void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id,
   println("{} {}", severity, message);
 }
 
+import glm;
+
 int main() {
+  // println("{}", glm::to_string(glm::translate(
+  //                   glm::ortho(-10.0, 10.0, -10.0, 10.0), {3, 3, 3})));
+  // println("{}", glm::to_string(glm::translate(glm::ortho(-1.0, 1.0,
+  // -1.0, 1.0),
+  //                                             {3, 3, 3})));
+
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -40,17 +53,50 @@ int main() {
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(debugCallback, 0);
 
-  const Renderer renderer{};
+  try {
+    const Renderer renderer{};
+    Object obj = Object::ngon({.sides = 3}, {.pos = {0, 0}});
+    // println("{} {}", glm::to_string(obj.collider.aabb.min),
+    //         glm::to_string(obj.collider.aabb.max));
+    const Object &objt = obj;
+    const Collider &coll = *objt.collider;
+    const AABB &aabb = *coll.aabb;
 
-  while (!glfwWindowShouldClose(window)) {
-    glClearColor(0.5, 0.5, 0.5, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    println("objt {:x}->{:x}->{:x}", reinterpret_cast<size_t>(&obj),
+            reinterpret_cast<size_t>(&(*obj.collider)),
+            reinterpret_cast<size_t>(&(*obj.collider->aabb)));
+    println("pos {}->{}->{}", glm::to_string(obj.pos),
+            glm::to_string(obj.collider->globalPos()),
+            glm::to_string(obj.collider->aabb->parent.globalPos()));
 
-    renderer.text("FOO", 100, 100);
+    println("coll {:x}<-{:x}->{:x}", reinterpret_cast<size_t>(&(coll.parent)),
+            reinterpret_cast<size_t>(&(coll)),
+            reinterpret_cast<size_t>(&(*coll.aabb)));
+    println("pos {}->{}->{}", glm::to_string(coll.parent.pos),
+            glm::to_string(coll.globalPos()),
+            glm::to_string(coll.aabb->parent.globalPos()));
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    println("aabb {:x}<-{:x}<-{:x}",
+            reinterpret_cast<size_t>(&(aabb.parent.parent)),
+            reinterpret_cast<size_t>(&(aabb.parent)),
+            reinterpret_cast<size_t>(&(aabb)));
+    println("pos {}->{}->{}", glm::to_string(aabb.parent.parent.pos),
+            glm::to_string(aabb.parent.globalPos()),
+            glm::to_string(aabb.parent.globalPos()));
 
-    // glfwSetWindowShouldClose(window, GLFW_TRUE);
+    while (!glfwWindowShouldClose(window)) {
+      glClearColor(0.5, 0.5, 0.5, 1);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      // renderer.render(obj);
+      renderer.render(*obj.collider->aabb, obj.getColor());
+
+      glfwSwapBuffers(window);
+      glfwPollEvents();
+
+      glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+  } catch (const std::runtime_error &err) {
+    println(err.what());
   }
 }
