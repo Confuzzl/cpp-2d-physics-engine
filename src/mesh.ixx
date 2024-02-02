@@ -25,7 +25,7 @@ template <typename T> struct BufferHolder {
   }
 };
 
-BufferHolder<VBO<ShapeVertex>> VBOHolder{};
+export BufferHolder<VBO<ShapeVertex>> VBOHolder{};
 BufferHolder<RadialEBO> EBOHolder{};
 
 export struct Mesh {

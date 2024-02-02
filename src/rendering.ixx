@@ -12,6 +12,11 @@ import shader;
 export struct Object;
 export struct AABB;
 
+struct render_opts {
+  bool showAABB = false;
+  GLenum primitive = GL_TRIANGLES;
+};
+
 export struct Renderer {
   static constexpr GLsizei WIDTH = 1280, HEIGHT = 720;
   static constexpr float ASPECT_RATIO = static_cast<float>(WIDTH) / HEIGHT;
@@ -35,6 +40,6 @@ export struct Renderer {
 
   void text(const std::string &str, const unsigned short x = 0,
             const unsigned short y = 0) const;
-  void render(const Object &object) const;
+  void render(const Object &object, render_opts &&opts) const;
   void render(const AABB &aabb, const glm::uvec3 &color) const;
 };

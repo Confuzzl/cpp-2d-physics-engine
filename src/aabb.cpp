@@ -1,16 +1,20 @@
 module aabb;
 
 import collider;
+import mesh;
 
 import debug;
 
-static VBO<ShapeVertex> sharedVBO() {
-  static VBO<ShapeVertex> out{4};
-  return out;
-}
+// generates invalid vbo for some reason?
+// static VBO<ShapeVertex> sharedVBO() {
+//   static VBO<ShapeVertex> out{4};
+//   // println("{}", out.ID);
+//   return out;
+// }
 
 AABB::AABB(const Collider &parent, const glm::vec2 &min, const glm::vec2 &max)
-    : parent{parent}, min{min}, max{max}, vbo{sharedVBO()} {}
+    : parent{parent}, min{min}, max{max},
+      vbo{/*sharedVBO()*/ VBOHolder.get(4)} {}
 
 void AABB::expand(const glm::vec2 &p) {
   min.x = std::min(min.x, p.x);

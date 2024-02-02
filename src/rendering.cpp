@@ -56,8 +56,6 @@ static unsigned short charHeightConvert(const unsigned char h) {
       Renderer::TEXEL_RANGE);
 }
 
-// import <glm/gtx/string_cast.hpp>;
-
 void Renderer::text(const std::string &str, const unsigned short x,
                     const unsigned short y) const {
   const GLuint vertexCount = 6 * static_cast<GLuint>(str.size());
@@ -119,7 +117,7 @@ void Renderer::text(const std::string &str, const unsigned short x,
 import scene;
 import object;
 
-void Renderer::render(const Object &object) const {
+void Renderer::render(const Object &object, render_opts &&opts) const {
   const Mesh &mesh = *object.mesh;
 
   glUseProgram(shapeShader.ID);
@@ -139,9 +137,10 @@ void Renderer::render(const Object &object) const {
 
   shapeShader.setFragColor(object.getColor());
 
-  glDrawElements(GL_TRIANGLES, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
+  glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
 
-  // render(*object.collider.aabb, object.getColor());
+  if (opts.showAABB)
+    render(*object.collider->aabb, object.getColor());
 }
 
 import aabb;
