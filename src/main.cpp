@@ -50,6 +50,7 @@ int main() {
   try {
     const Renderer renderer{};
     Object obj = Object::ngon({.sides = 3}, {.pos = {0, 0}});
+    Object obj2 = Object::circle({}, {});
 
     while (!glfwWindowShouldClose(window)) {
       glClearColor(0.5, 0.5, 0.5, 1);
@@ -61,7 +62,7 @@ int main() {
       glfwSwapBuffers(window);
       glfwPollEvents();
 
-      glfwSetWindowShouldClose(window, GLFW_TRUE);
+      // glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
   } catch (const std::runtime_error &err) {
     println(err.what());
