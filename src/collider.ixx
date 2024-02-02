@@ -24,12 +24,15 @@ export struct Convex : public Collider {
   std::vector<glm::vec2> vertices;
 
   Convex(const Object &parent, std::vector<glm::vec2> &&vertices);
-  static Convex create(const Object &parent, const unsigned char n,
-                       const double radius, const double offset);
+  static std::unique_ptr<Convex> create(const Object &parent,
+                                        const unsigned char n,
+                                        const double radius,
+                                        const double offset);
 };
 export struct Circle : public Collider {
   const double radius = 1;
 
   Circle(const Object &parent, const double radius);
-  static Circle create(const Object &parent, const double radius);
+  static std::unique_ptr<Circle> create(const Object &parent,
+                                        const double radius);
 };

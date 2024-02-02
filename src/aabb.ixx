@@ -23,4 +23,6 @@ export struct AABB {
   void expand(const glm::vec2 &p);
 
   std::array<glm::vec2, 4> corners() const;
+
+  glm::vec2 globalPos() const;
 };

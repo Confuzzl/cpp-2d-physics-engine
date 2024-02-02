@@ -39,8 +39,8 @@ export struct Object {
 
   // Mesh mesh;
   // Collider collider;
-  Mesh mesh;
-  Collider collider;
+  std::unique_ptr<Mesh> mesh;
+  std::unique_ptr<Collider> collider;
 
   Object(ngon_opts &&opts, obj_opts &&obj_opts);
 

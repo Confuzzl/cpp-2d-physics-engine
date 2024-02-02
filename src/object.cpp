@@ -5,16 +5,11 @@ import debug;
 glm::uvec3 Object::getColor() const { return color; }
 
 Object::Object(ngon_opts &&opts, obj_opts &&obj_opts)
-    : Object(std::make_unique<Mesh>(
-                 Mesh::ngon(opts.sides, opts.radius, opts.offset)),
-             std::make_unique<Collider>(
-                 Convex::create(*this, opts.sides, opts.radius, opts.offset)),
-             std::move(obj_opts)) {
-  println("object convex {:x}", reinterpret_cast<size_t>(&*collider));
-}
+    : Object(Mesh::ngon(opts.sides, opts.radius, opts.offset),
+             Convex::create(*this, opts.sides, opts.radius, opts.offset),
+             std::move(obj_opts)) {}
 Object::Object(circle_opts &&opts, obj_opts &&obj_opts)
-    : Object(std::make_unique<Mesh>(Mesh::circle(opts.radius)),
-             std::make_unique<Collider>(Circle::create(*this, opts.radius)),
+    : Object(Mesh::circle(opts.radius), Circle::create(*this, opts.radius),
              std::move(obj_opts)) {}
 Object::Object(std::unique_ptr<Mesh> mesh, std::unique_ptr<Collider> collider,
                obj_opts &&opts)

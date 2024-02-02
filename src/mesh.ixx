@@ -9,6 +9,8 @@ export module mesh;
 import <vector>;
 import <functional>;
 import <map>;
+import <memory>;
+
 import buffer_objects;
 import vertices;
 import poly;
@@ -38,15 +40,17 @@ export struct Mesh {
         vbo{VBOHolder.get(static_cast<unsigned char>(data.size()))},
         ebo{EBOHolder.get(static_cast<unsigned char>(data.size()))} {}
 
-  static Mesh ngon(const unsigned char n, const double radius,
-                   const double offset) {
+  static std::unique_ptr<Mesh> ngon(const unsigned char n, const double radius,
+                                    const double offset) {
     std::vector<ShapeVertex> data{};
     data.reserve(n + 1);
     data.emplace_back(0.0f, 0.0f);
     const auto poly = ngonVertices(n, radius, offset);
     for (const auto &vertex : poly)
       data.emplace_back(vertex.x, vertex.y);
-    return {data};
+    return std::make_unique<Mesh>(data);
   }
-  static Mesh circle(const double radius) { return ngon(SEGMENTS, radius, 0); }
+  static std::unique_ptr<Mesh> circle(const double radius) {
+    return ngon(SEGMENTS, radius, 0);
+  }
 };
