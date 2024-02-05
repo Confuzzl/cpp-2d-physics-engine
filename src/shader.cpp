@@ -13,9 +13,9 @@ static std::string sourceToString(const std::string &name) {
   return {std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>()};
 }
 
-Shader::Shader(const std::string &name) {
-  ID = glCreateProgram();
+Shader::Shader(const std::string &name) : name{name} {}
 
+void Shader::createShaders() {
   GLuint vertID = 0, fragID = 0;
   compileShader(GL_VERTEX_SHADER, vertID, std::format("assets/{}.vert", name));
   compileShader(GL_FRAGMENT_SHADER, fragID,
@@ -26,6 +26,13 @@ Shader::Shader(const std::string &name) {
   glLinkProgram(ID);
   glDeleteShader(vertID);
   glDeleteShader(fragID);
+}
+
+void Shader::create() {
+  ID = glCreateProgram();
+  createShaders();
+  createVAO();
+  createUniforms();
 }
 
 void Shader::compileShader(const GLenum type, GLuint &ID,
@@ -53,9 +60,8 @@ void Shader::compileShader(const GLenum type, GLuint &ID,
   println("{} {}", source, ID);
 }
 
-FontShader::FontShader()
-    : Shader("font"), projection{ID, "projection"},
-      font_color{ID, "font_color"} {
+FontShader::FontShader() : Shader("font") {}
+void FontShader::createVAO() {
   glCreateVertexArrays(1, &vao);
   glEnableVertexArrayAttrib(vao, 0);
   glVertexArrayAttribFormat(vao, 0, 2, GL_FLOAT, false, 0);
@@ -65,6 +71,10 @@ FontShader::FontShader()
                             2 * sizeof(GLfloat));
   glVertexArrayAttribBinding(vao, 1, 0);
 }
+void FontShader::createUniforms() {
+  projection.create(ID, "projection");
+  font_color.create(ID, "font_color");
+}
 
 void FontShader::setProjection(const glm::mat4 &matrix) const {
   setUniform(projection, matrix);
@@ -73,13 +83,18 @@ void FontShader::setFontColor(const glm::uvec3 &color) const {
   setUniform(font_color, color);
 }
 
-ShapeShader::ShapeShader()
-    : Shader("shape"), parent_pos{ID, "parent_pos"}, rotation{ID, "rotation"},
-      view{ID, "view"}, frag_color{ID, "frag_color"} {
+ShapeShader::ShapeShader() : Shader("shape") {}
+void ShapeShader::createVAO() {
   glCreateVertexArrays(1, &vao);
   glEnableVertexArrayAttrib(vao, 0);
   glVertexArrayAttribFormat(vao, 0, 2, GL_FLOAT, false, 0);
   glVertexArrayAttribBinding(vao, 0, 0);
+}
+void ShapeShader::createUniforms() {
+  parent_pos.create(ID, "parent_pos");
+  rotation.create(ID, "rotation");
+  view.create(ID, "view");
+  frag_color.create(ID, "frag_color");
 }
 
 void ShapeShader::setParentPos(const glm::vec2 &pos) const {

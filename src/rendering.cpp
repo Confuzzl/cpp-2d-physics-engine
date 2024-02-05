@@ -5,6 +5,7 @@ module;
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <algorithm>
 #include <fstream>
 
 module rendering;
@@ -27,7 +28,11 @@ const glm::mat4 Renderer::UI_MATRIX{
     glm::ortho(0.0f, static_cast<float>(App::WIDTH), 0.0f,
                static_cast<float>(App::HEIGHT))};
 
-Renderer::Renderer() { initFontTexture(); }
+Renderer::Renderer() {
+  initFontTexture();
+  shapeShader.create();
+  fontShader.create();
+}
 
 void Renderer::initFontTexture() {
   glCreateTextures(GL_TEXTURE_2D, 1, &fontTexture);
@@ -116,7 +121,14 @@ void Renderer::text(const std::string &str, const unsigned short x,
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 }
 
-void Renderer::render() const {}
+void Renderer::render() const {
+  // std::ranges::for_each(
+  //     MAIN_SCENE.objects,
+  //     [this](const std::unique_ptr<Object> &obj) { render(*obj, {}); });
+  for (const std::unique_ptr<Object> &obj : MAIN_SCENE.objects) {
+    render(*obj, {});
+  }
+}
 
 import object;
 

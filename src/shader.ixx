@@ -12,7 +12,7 @@ import glm;
 template <typename T> struct uniform {
   GLint location;
 
-  uniform(GLuint shaderID, const std::string &name) {
+  void create(GLuint shaderID, const std::string &name) {
     const GLint loc = glGetUniformLocation(shaderID, name.c_str());
     if (loc == -1)
       throw std::runtime_error{
@@ -25,9 +25,19 @@ export struct Shader {
   GLuint ID;
   GLuint vao;
 
+  const std::string name;
+
+protected:
   Shader(const std::string &name);
 
+private:
+  void createShaders();
   void compileShader(const GLenum type, GLuint &ID, const std::string &source);
+  virtual void createVAO() = 0;
+  virtual void createUniforms() = 0;
+
+public:
+  void create();
 
   template <typename T>
   void setUniform(const uniform<T> &uniform, const T &value) const;
@@ -54,23 +64,33 @@ export struct Shader {
 };
 
 export struct FontShader : public Shader {
-  const uniform<glm::mat4> projection;
-  const uniform<glm::uvec3> font_color;
+  uniform<glm::mat4> projection;
+  uniform<glm::uvec3> font_color;
 
   FontShader();
 
+private:
+  void createVAO() override;
+  void createUniforms() override;
+
+public:
   void setProjection(const glm::mat4 &matrix) const;
   void setFontColor(const glm::uvec3 &color) const;
 };
 
 export struct ShapeShader : public Shader {
-  const uniform<glm::vec2> parent_pos;
-  const uniform<float> rotation;
-  const uniform<glm::mat4> view;
-  const uniform<glm::uvec3> frag_color;
+  uniform<glm::vec2> parent_pos;
+  uniform<float> rotation;
+  uniform<glm::mat4> view;
+  uniform<glm::uvec3> frag_color;
 
   ShapeShader();
 
+private:
+  void createVAO() override;
+  void createUniforms() override;
+
+public:
   void setParentPos(const glm::vec2 &pos) const;
   void setRotation(const float value) const;
   void setView(const glm::mat4 &matrix) const;

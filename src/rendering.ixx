@@ -31,11 +31,12 @@ export struct Renderer {
 
   Renderer();
 
+private:
   void initFontTexture();
-
   void compileShader(const GLenum type, GLuint &ID, const std::string &source);
   void createShader(GLuint &ID, const std::string &name);
 
+public:
   void text(const std::string &str, const unsigned short x = 0,
             const unsigned short y = 0) const;
   void render() const;

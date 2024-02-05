@@ -34,7 +34,7 @@ export struct App {
   void startUpdate(const double t);
   void processInput(const double dt);
   void startFrame(const double t);
-} MAIN_APP;
+} MAIN_APP{};
 
 export Scene &MAIN_SCENE = MAIN_APP.scene;
 export Camera &MAIN_CAMERA = MAIN_SCENE.camera;

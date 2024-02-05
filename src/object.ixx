@@ -35,11 +35,12 @@ export struct Object {
   float rotation;
   double angVelocity = 0;
 
+private:
   glm::u8vec3 color;
+
+public:
   glm::uvec3 getColor() const;
 
-  // Mesh mesh;
-  // Collider collider;
   std::unique_ptr<Mesh> mesh;
   std::unique_ptr<Collider> collider;
 
@@ -52,6 +53,8 @@ export struct Object {
 
   static Object &ngon(ngon_opts &&opts, obj_opts &&obj_opts);
   static Object &circle(circle_opts &&opts, obj_opts &&obj_opts);
+
+private:
   template <typename shape_opts_t>
   static Object &genericCreate(shape_opts_t &&opts, obj_opts &&obj_opts) {
     auto pair = MAIN_SCENE.objects.emplace(
@@ -60,6 +63,7 @@ export struct Object {
     return **it;
   }
 
+public:
   void translate(const glm::vec2 &v);
   void rotate(const float r);
 };
