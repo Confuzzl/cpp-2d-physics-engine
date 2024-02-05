@@ -18,12 +18,14 @@ import debug;
 import vertices;
 import buffer_objects;
 import mesh;
+import app;
 
 static const glm::lowp_u16vec2 QUAD_UVS[2][3]{{{0, 0}, {1, 0}, {1, 1}},
                                               {{0, 0}, {1, 1}, {0, 1}}};
 
-const glm::mat4 Renderer::UI_MATRIX{glm::ortho(
-    0.0f, static_cast<float>(WIDTH), 0.0f, static_cast<float>(HEIGHT))};
+const glm::mat4 Renderer::UI_MATRIX{
+    glm::ortho(0.0f, static_cast<float>(App::WIDTH), 0.0f,
+               static_cast<float>(App::HEIGHT))};
 
 Renderer::Renderer() { initFontTexture(); }
 
@@ -114,7 +116,8 @@ void Renderer::text(const std::string &str, const unsigned short x,
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 }
 
-import scene;
+void Renderer::render() const {}
+
 import object;
 
 void Renderer::render(const Object &object, render_opts &&opts) const {

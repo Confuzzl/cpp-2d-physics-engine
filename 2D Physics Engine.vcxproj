@@ -144,12 +144,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\aabb.ixx" />
+    <ClCompile Include="src\app\app.cpp" />
+    <ClCompile Include="src\app\app.ixx" />
+    <ClCompile Include="src\app\input\input_handler.cpp" />
+    <ClCompile Include="src\app\input\key.ixx" />
     <ClCompile Include="src\buffer_objects.ixx" />
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\camera.ixx" />
     <ClCompile Include="src\collider.cpp" />
     <ClCompile Include="src\collider.ixx" />
     <ClCompile Include="src\debug.ixx" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\glm.ixx" />
+    <ClCompile Include="src\gl_debug.ixx" />
+    <ClCompile Include="src\app\input\input_handler.ixx" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mesh.ixx" />
     <ClCompile Include="src\object.cpp" />
@@ -163,6 +171,7 @@
     <ClCompile Include="src\aabb.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\shader.ixx" />
+    <ClCompile Include="src\app\update_cycle.ixx" />
     <ClCompile Include="src\vertices.ixx" />
   </ItemGroup>
   <ItemGroup>

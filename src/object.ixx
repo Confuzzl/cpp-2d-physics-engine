@@ -5,6 +5,7 @@ import <memory>;
 
 import mesh;
 import collider;
+import app;
 
 import math;
 
@@ -49,8 +50,15 @@ export struct Object {
          obj_opts &&opts);
   ~Object();
 
-  static Object ngon(ngon_opts &&opts, obj_opts &&obj_opts);
-  static Object circle(circle_opts &&opts, obj_opts &&obj_opts);
+  static Object &ngon(ngon_opts &&opts, obj_opts &&obj_opts);
+  static Object &circle(circle_opts &&opts, obj_opts &&obj_opts);
+  template <typename shape_opts_t>
+  static Object &genericCreate(shape_opts_t &&opts, obj_opts &&obj_opts) {
+    auto pair = MAIN_SCENE.objects.emplace(
+        std::make_unique<Object>(std::move(opts), std::move(obj_opts)));
+    auto &it = pair.first;
+    return **it;
+  }
 
   void translate(const glm::vec2 &v);
   void rotate(const float r);
