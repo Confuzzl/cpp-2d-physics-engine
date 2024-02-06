@@ -1,6 +1,6 @@
 module;
 
-#include "gl.h"
+#include "util/gl.h"
 
 export module gl_debug;
 

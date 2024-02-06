@@ -4,7 +4,7 @@ import glm;
 
 export struct Camera {
   glm::vec2 pos{};
-  float speed = 1;
+  float speed = 5;
 
   float zoom = 1;
   glm::mat4 proj;

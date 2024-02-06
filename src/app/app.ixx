@@ -1,6 +1,6 @@
 module;
 
-#include "gl.h"
+#include "util/gl.h"
 
 export module app;
 
@@ -34,6 +34,8 @@ export struct App {
   void startUpdate(const double t);
   void processInput(const double dt);
   void startFrame(const double t);
+
+  void close();
 } MAIN_APP{};
 
 export Scene &MAIN_SCENE = MAIN_APP.scene;

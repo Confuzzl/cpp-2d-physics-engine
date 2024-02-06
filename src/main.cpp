@@ -1,5 +1,5 @@
 #pragma once
-#include "gl.h"
+#include "util/gl.h"
 
 import rendering;
 import debug;

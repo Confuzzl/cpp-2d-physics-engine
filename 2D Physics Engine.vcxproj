@@ -154,16 +154,16 @@
     <ClCompile Include="src\camera.ixx" />
     <ClCompile Include="src\collider.cpp" />
     <ClCompile Include="src\collider.ixx" />
-    <ClCompile Include="src\debug.ixx" />
+    <ClCompile Include="src\util\debug.ixx" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\glm.ixx" />
+    <ClCompile Include="src\util\glm.ixx" />
     <ClCompile Include="src\gl_debug.ixx" />
     <ClCompile Include="src\app\input\input_handler.ixx" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mesh.ixx" />
     <ClCompile Include="src\object.cpp" />
     <ClCompile Include="src\object.ixx" />
-    <ClCompile Include="src\poly.ixx" />
+    <ClCompile Include="src\util\poly.ixx" />
     <ClCompile Include="src\math.ixx" />
     <ClCompile Include="src\rendering.cpp" />
     <ClCompile Include="src\rendering.ixx" />
@@ -176,7 +176,7 @@
     <ClCompile Include="src\vertices.ixx" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\gl.h" />
+    <ClInclude Include="src\util\gl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 module;
 
-#include "gl.h"
+#include "util/gl.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -57,18 +57,19 @@ void Renderer::renderFrame(const double t) const {
   glClearColor(0, 1, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  renderScene(t);
   renderText(t);
+  renderScene(t);
 
   glfwSwapBuffers(MAIN_APP.window);
 }
 void Renderer::renderScene(const double t) const {
   for (const std::unique_ptr<Object> &obj : MAIN_SCENE.objects) {
-    render(*obj, {});
+    render(*obj, {.showAABB = true});
   }
 }
 void Renderer::renderText(const double t) const {
   text(std::format("t: {:.2f}s", glfwGetTime()), 0, 0);
+  text(std::format("z: {:.2f}", MAIN_CAMERA.zoom), 0, 100);
 }
 
 static unsigned short charWidthConvert(const unsigned char w) {

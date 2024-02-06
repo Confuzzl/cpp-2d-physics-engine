@@ -1,19 +1,20 @@
 module;
 
-#include "gl.h"
+#include "util/gl.h"
 
 module input_handler;
 
 import app;
+import debug;
 
 void InputHandler::processInput(const double dt) {
   glfwPollEvents();
-  keys.at(GLFW_KEY_W).processJustOff(dt);
-  // for (auto &[keycode, key] : keys)
-  //   key(dt);
+  for (auto &[keycode, key] : keys)
+    key(dt);
 }
 
 std::map<int, Key> InputHandler::keys{
+    {GLFW_KEY_ESCAPE, {[](const double) { MAIN_APP.close(); }}},
     {GLFW_KEY_W, {Key::moveFunction(glm::vec2{0, +1})}},
     {GLFW_KEY_A, {Key::moveFunction(glm::vec2{-1, 0})}},
     {GLFW_KEY_S, {Key::moveFunction(glm::vec2{0, -1})}},
@@ -32,5 +33,5 @@ void InputHandler::mouseCallback(GLFWwindow *window, double xpos, double ypos) {
 void InputHandler::scrollCallback(GLFWwindow *window, double xpos,
                                   double ypos) {
   MAIN_CAMERA.zoom =
-      std::fmax(0.0f, static_cast<float>(MAIN_CAMERA.zoom + ypos * 0.25));
+      std::fmax(0.01f, static_cast<float>(MAIN_CAMERA.zoom + ypos * 0.25));
 }

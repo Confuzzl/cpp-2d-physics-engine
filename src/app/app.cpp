@@ -1,6 +1,6 @@
 module;
 
-#include "gl.h"
+#include "util/gl.h"
 
 module app;
 
@@ -26,6 +26,7 @@ App::App() : loopCycle{0}, updateCycle{120}, frameCycle{60} {
   glViewport(0, 0, WIDTH, HEIGHT);
 
   glfwSetCursorPosCallback(window, InputHandler::mouseCallback);
+  glfwSetScrollCallback(window, InputHandler::scrollCallback);
   glfwSetKeyCallback(window, InputHandler::keyCallback);
 
   glPointSize(10);
@@ -40,9 +41,9 @@ App::App() : loopCycle{0}, updateCycle{120}, frameCycle{60} {
   glDebugMessageCallback(GL::debugCallback, 0);
 }
 App::~App() {
+  println("app terminated at {:.2f}s", glfwGetTime());
   glfwDestroyWindow(window);
   glfwTerminate();
-  println("app terminated at {:.2f}s", glfwGetTime());
 }
 
 void App::start() {
@@ -76,3 +77,5 @@ void App::startFrame(const double t) {
   frameCycle.pushNewTime(t);
   renderer.renderFrame(t);
 }
+
+void App::close() { glfwSetWindowShouldClose(window, true); }
