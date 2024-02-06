@@ -4,6 +4,7 @@ module;
 
 module app;
 
+import input_handler;
 import debug;
 import gl_debug;
 import <stdexcept>;
@@ -24,6 +25,9 @@ App::App() : loopCycle{0}, updateCycle{120}, frameCycle{60} {
   gladLoadGL();
   glViewport(0, 0, WIDTH, HEIGHT);
 
+  glfwSetCursorPosCallback(window, InputHandler::mouseCallback);
+  glfwSetKeyCallback(window, InputHandler::keyCallback);
+
   glPointSize(10);
   glLineWidth(5);
   glPolygonMode(GL_FRONT, GL_FILL);
@@ -42,6 +46,9 @@ App::~App() {
 }
 
 void App::start() {
+  renderer.init();
+  scene.init();
+
   while (!glfwWindowShouldClose(window)) {
     double currentTime = glfwGetTime();
 
@@ -61,8 +68,11 @@ void App::start() {
   }
 }
 
-void App::startUpdate(const double t) { updateCycle.pushNewTime(t); }
+void App::startUpdate(const double t) {
+  updateCycle.pushNewTime(t);
+  InputHandler::processInput(updateCycle.dt);
+}
 void App::startFrame(const double t) {
   frameCycle.pushNewTime(t);
-  renderer.render();
+  renderer.renderFrame(t);
 }

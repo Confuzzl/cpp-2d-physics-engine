@@ -15,4 +15,6 @@ export struct Scene {
 
   Scene();
   ~Scene();
+
+  void init();
 };

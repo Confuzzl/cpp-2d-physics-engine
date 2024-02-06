@@ -28,7 +28,8 @@ const glm::mat4 Renderer::UI_MATRIX{
     glm::ortho(0.0f, static_cast<float>(App::WIDTH), 0.0f,
                static_cast<float>(App::HEIGHT))};
 
-Renderer::Renderer() {
+Renderer::Renderer() {}
+void Renderer::init() {
   initFontTexture();
   shapeShader.create();
   fontShader.create();
@@ -52,6 +53,24 @@ void Renderer::initFontTexture() {
   stbi_image_free(data);
 }
 
+void Renderer::renderFrame(const double t) const {
+  glClearColor(0, 1, 1, 1);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  renderScene(t);
+  renderText(t);
+
+  glfwSwapBuffers(MAIN_APP.window);
+}
+void Renderer::renderScene(const double t) const {
+  for (const std::unique_ptr<Object> &obj : MAIN_SCENE.objects) {
+    render(*obj, {});
+  }
+}
+void Renderer::renderText(const double t) const {
+  text(std::format("t: {:.2f}s", glfwGetTime()), 0, 0);
+}
+
 static unsigned short charWidthConvert(const unsigned char w) {
   return static_cast<unsigned short>(
       static_cast<float>(w) * Renderer::CHAR_WIDTH / Renderer::FONT_WIDTH *
@@ -64,7 +83,7 @@ static unsigned short charHeightConvert(const unsigned char h) {
 }
 
 void Renderer::text(const std::string &str, const unsigned short x,
-                    const unsigned short y) const {
+                    const unsigned short y, const double scale) const {
   const GLuint vertexCount = 6 * static_cast<GLuint>(str.size());
 
   std::vector<FontVertex> vertices{};
@@ -74,6 +93,8 @@ void Renderer::text(const std::string &str, const unsigned short x,
   for (const char c : str) {
     const char id = c - 32;
     const unsigned char row = id / COLUMNS, column = id % COLUMNS;
+
+    const double width = CHAR_WIDTH * scale, height = CHAR_HEIGHT * scale;
 
     glm::vec4 uvInfo{column * CHAR_WIDTH, row * CHAR_HEIGHT, CHAR_WIDTH,
                      CHAR_HEIGHT};
@@ -86,19 +107,17 @@ void Renderer::text(const std::string &str, const unsigned short x,
 
     for (auto tri = 0; tri < 2; tri++) {
       for (auto v = 0; v < 3; v++) {
-        const glm::vec2 pos{xOffset + CHAR_WIDTH * QUAD_UVS[tri][v][0],
-                            y + CHAR_HEIGHT * QUAD_UVS[tri][v][1]};
+        const glm::vec2 pos{xOffset + width * QUAD_UVS[tri][v][0],
+                            y + height * QUAD_UVS[tri][v][1]};
         const glm::lowp_u16vec2 uv = QUAD_UVS[tri][v];
         vertices.emplace_back(
             pos[0], pos[1],
             charWidthConvert(column) + uv[0] * charWidthConvert(1),
             charHeightConvert(ROWS - row - 1) + uv[1] * charHeightConvert(1));
-
-        println("{}", glm::to_string(UI_MATRIX * glm::vec4{pos, 0.0, 1.0}));
       }
     }
 
-    xOffset += CHAR_WIDTH;
+    xOffset += static_cast<unsigned short>(CHAR_WIDTH * scale);
   }
 
   VBO<FontVertex> vbo{vertexCount};
@@ -119,15 +138,6 @@ void Renderer::text(const std::string &str, const unsigned short x,
   glBindVertexArray(fontShader.vao);
 
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
-}
-
-void Renderer::render() const {
-  // std::ranges::for_each(
-  //     MAIN_SCENE.objects,
-  //     [this](const std::unique_ptr<Object> &obj) { render(*obj, {}); });
-  for (const std::unique_ptr<Object> &obj : MAIN_SCENE.objects) {
-    render(*obj, {});
-  }
 }
 
 import object;

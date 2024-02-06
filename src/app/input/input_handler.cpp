@@ -8,8 +8,9 @@ import app;
 
 void InputHandler::processInput(const double dt) {
   glfwPollEvents();
-  for (auto &[keycode, key] : keys)
-    key(dt);
+  keys.at(GLFW_KEY_W).processJustOff(dt);
+  // for (auto &[keycode, key] : keys)
+  //   key(dt);
 }
 
 std::map<int, Key> InputHandler::keys{

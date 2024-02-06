@@ -30,6 +30,8 @@ export struct Renderer {
   GLuint fontTexture = 0;
 
   Renderer();
+  /*call after glfwinit*/
+  void init();
 
 private:
   void initFontTexture();
@@ -37,9 +39,13 @@ private:
   void createShader(GLuint &ID, const std::string &name);
 
 public:
+  void renderFrame(const double t) const;
+  void renderScene(const double t) const;
+  void renderText(const double t) const;
+
   void text(const std::string &str, const unsigned short x = 0,
-            const unsigned short y = 0) const;
-  void render() const;
+            const unsigned short y = 0, const double scale = 0.5) const;
+
   void render(const Object &object, render_opts &&opts) const;
   void render(const AABB &aabb, const glm::uvec3 &color) const;
 };
