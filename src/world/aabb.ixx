@@ -17,8 +17,8 @@ export struct AABB {
 
   glm::vec2 min{}, max{};
 
-  AABB(const Collider &parent, const glm::vec2 &min = {POS_INF, POS_INF},
-       const glm::vec2 &max = {NEG_INF, NEG_INF});
+  AABB(const Collider &parent, const glm::vec2 &min = {F_INF_POS, F_INF_POS},
+       const glm::vec2 &max = {F_INF_NEG, F_INF_NEG});
 
   void expand(const glm::vec2 &p);
 

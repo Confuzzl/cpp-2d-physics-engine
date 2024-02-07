@@ -17,5 +17,8 @@ export glm::u8vec3 randomColor() {
 
 import <limits>;
 
-export constexpr float POS_INF = std::numeric_limits<float>::infinity();
-export constexpr float NEG_INF = -POS_INF;
+export constexpr float F_INF_POS = std::numeric_limits<float>::infinity();
+export constexpr float F_INF_NEG = -F_INF_POS;
+
+export constexpr double D_INF_POS = std::numeric_limits<double>::infinity();
+export constexpr double D_INF_NEG = -D_INF_POS;
