@@ -143,37 +143,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\aabb.ixx" />
+    <ClCompile Include="src\world\aabb.ixx" />
     <ClCompile Include="src\app\app.cpp" />
     <ClCompile Include="src\app\app.ixx" />
     <ClCompile Include="src\app\input\input_handler.cpp" />
     <ClCompile Include="src\app\input\key.cpp" />
     <ClCompile Include="src\app\input\key.ixx" />
-    <ClCompile Include="src\buffer_objects.ixx" />
-    <ClCompile Include="src\camera.cpp" />
-    <ClCompile Include="src\camera.ixx" />
-    <ClCompile Include="src\collider.cpp" />
-    <ClCompile Include="src\collider.ixx" />
+    <ClCompile Include="src\gl_wrapper\buffer_objects.ixx" />
+    <ClCompile Include="src\world\camera.cpp" />
+    <ClCompile Include="src\world\camera.ixx" />
+    <ClCompile Include="src\world\collider.cpp" />
+    <ClCompile Include="src\world\collider.ixx" />
     <ClCompile Include="src\util\debug.ixx" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\util\glm.ixx" />
-    <ClCompile Include="src\gl_debug.ixx" />
+    <ClCompile Include="src\util\gl_debug.ixx" />
     <ClCompile Include="src\app\input\input_handler.ixx" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\mesh.ixx" />
-    <ClCompile Include="src\object.cpp" />
-    <ClCompile Include="src\object.ixx" />
+    <ClCompile Include="src\world\mesh.ixx" />
+    <ClCompile Include="src\world\object.cpp" />
+    <ClCompile Include="src\world\object.ixx" />
     <ClCompile Include="src\util\poly.ixx" />
-    <ClCompile Include="src\math.ixx" />
-    <ClCompile Include="src\rendering.cpp" />
-    <ClCompile Include="src\rendering.ixx" />
-    <ClCompile Include="src\scene.cpp" />
-    <ClCompile Include="src\scene.ixx" />
-    <ClCompile Include="src\aabb.cpp" />
-    <ClCompile Include="src\shader.cpp" />
-    <ClCompile Include="src\shader.ixx" />
+    <ClCompile Include="src\util\math.ixx" />
+    <ClCompile Include="src\app\rendering.cpp" />
+    <ClCompile Include="src\app\rendering.ixx" />
+    <ClCompile Include="src\world\scene.cpp" />
+    <ClCompile Include="src\world\scene.ixx" />
+    <ClCompile Include="src\world\aabb.cpp" />
+    <ClCompile Include="src\gl_wrapper\shader.cpp" />
+    <ClCompile Include="src\gl_wrapper\shader.ixx" />
     <ClCompile Include="src\app\update_cycle.ixx" />
-    <ClCompile Include="src\vertices.ixx" />
+    <ClCompile Include="src\gl_wrapper\vertices.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\util\gl.h" />

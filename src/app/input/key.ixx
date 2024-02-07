@@ -6,7 +6,7 @@ import <functional>;
 export struct Key {
   using Callback = std::function<void(const double)>;
 
-  static const Callback NONE;
+  // static const Callback NONE;
 
   bool on = false;
   bool justUsed = false;
@@ -26,5 +26,6 @@ export struct Key {
   void operator()(const double dt);
 
   static Callback moveFunction(const glm::vec2 &direction);
+
+  static Callback NONE();
 };
-const Key::Callback Key::NONE{[](const double) {}};

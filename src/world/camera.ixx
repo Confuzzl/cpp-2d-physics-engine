@@ -16,5 +16,6 @@ export struct Camera {
 
   glm::mat4 getView() const;
   const glm::mat4 &getProj() const;
-  // void setZoom(const float zoom);
+
+  float relSpeed() const;
 };

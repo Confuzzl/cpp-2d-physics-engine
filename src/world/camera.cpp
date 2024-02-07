@@ -17,4 +17,5 @@ glm::mat4 Camera::getView() const {
   return out;
 }
 const glm::mat4 &Camera::getProj() const { return proj; }
-// void Camera::setZoom(const float zoom) { this->zoom = zoom; }
+
+float Camera::relSpeed() const { return speed * zoom; }

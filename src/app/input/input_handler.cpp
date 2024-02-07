@@ -32,6 +32,7 @@ void InputHandler::mouseCallback(GLFWwindow *window, double xpos, double ypos) {
 }
 void InputHandler::scrollCallback(GLFWwindow *window, double xpos,
                                   double ypos) {
-  MAIN_CAMERA.zoom =
-      std::fmax(0.01f, static_cast<float>(MAIN_CAMERA.zoom + ypos * 0.25));
+  static float INCREMENT = 0.1f;
+  MAIN_CAMERA.zoom = std::fmax(
+      INCREMENT, static_cast<float>(MAIN_CAMERA.zoom + ypos * INCREMENT));
 }
