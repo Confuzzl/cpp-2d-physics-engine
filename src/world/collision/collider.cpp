@@ -1,3 +1,7 @@
+module;
+
+#include <ranges>
+
 module collider;
 
 import object;
@@ -8,12 +12,27 @@ import debug;
 Collider::Collider(const Object &parent, std::unique_ptr<AABB> aabb)
     : parent{parent}, aabb{std::move(aabb)} {}
 
-glm::vec2 Collider::globalPos() const { return parent.pos; }
+const auto &Collider::props() const { return parent.properties; }
+glm::vec2 Collider::pos() const { return parent.properties.pos; }
+float Collider::rot() const { return parent.properties.rotation; }
+
 AABB &Collider::getAABB() { return *aabb; }
+
+import func;
 
 Convex::Convex(const Object &parent, std::vector<glm::vec2> &&vertices)
     : Collider(parent, std::make_unique<AABB>(*this)),
-      vertices{std::move(vertices)} {
+      vertices{std::move(vertices)},
+      vvv{func::map<glm::vec2, vertex>(this->vertices,
+                                       [this](const glm::vec2 &v) {
+                                         return vertex{*this, v};
+                                       })} /*,
+       eee{func::map2<vertex, edge>(
+           vertices, [this](const vertex &v, const int i ,
+                            const std::vector<vertex> &vertices) {
+             return edge{*this, v, vertices[(i + 1) % vertices.size()]};
+           })}*/
+{
 
   for (const glm::vec2 &v : vertices) {
     aabb->expand(v);
@@ -27,13 +46,17 @@ std::unique_ptr<Convex> Convex::create(const Object &parent,
                                   std::move(ngonVertices(n, radius, offset)));
 }
 
-Circle::Circle(const Object &parent, const double radius)
+auto Convex::globalVertices() const {
+  return vertices | std::views::transform([](const glm::vec2 &v) { return v; });
+}
+
+Circle::Circle(const Object &parent, const float radius)
     : Collider(parent,
                std::make_unique<AABB>(*this, glm::vec2{-radius, -radius},
                                       glm::vec2{+radius, +radius})),
       radius{radius} {}
 std::unique_ptr<Circle> Circle::create(const Object &parent,
-                                       const double radius) {
+                                       const float radius) {
   return std::make_unique<Circle>(parent, radius);
 }
 

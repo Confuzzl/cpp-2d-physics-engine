@@ -166,7 +166,7 @@ void Renderer::render(const Object &object, render_opts &&opts) const {
   glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
 
   if (opts.showAABB)
-    render(object.collider->getAABB(), object.getColor());
+    render(*object.collider->aabb, object.getColor());
 }
 
 import aabb;
@@ -183,7 +183,7 @@ void Renderer::render(const AABB &aabb, const glm::uvec3 &color) const {
                          glm::value_ptr(vertex));
     offset += sizeof(vertex);
   }
-  shapeShader.setParentPos(aabb.parent.pos());
+  shapeShader.setParentPos(aabb.parent.globalPos());
   shapeShader.setView(MAIN_SCENE.camera.getView());
 
   shapeShader.setFragColor(color);

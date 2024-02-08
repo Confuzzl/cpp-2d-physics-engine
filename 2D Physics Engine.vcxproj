@@ -143,7 +143,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\world\aabb.ixx" />
+    <ClCompile Include="src\util\func.ixx" />
+    <ClCompile Include="src\world\collision\aabb.ixx" />
     <ClCompile Include="src\app\app.cpp" />
     <ClCompile Include="src\app\app.ixx" />
     <ClCompile Include="src\app\input\input_handler.cpp" />
@@ -162,6 +163,9 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\world\collision\sat\axis.cpp" />
     <ClCompile Include="src\world\collision\sat\axis.ixx" />
+    <ClCompile Include="src\world\collision\sat\circcirc.ixx" />
+    <ClCompile Include="src\world\collision\sat\polycirc.ixx" />
+    <ClCompile Include="src\world\collision\sat\polypoly.ixx" />
     <ClCompile Include="src\world\collision\sat\query_info.ixx" />
     <ClCompile Include="src\world\collision\sat\sat.ixx" />
     <ClCompile Include="src\world\mesh.ixx" />
@@ -173,7 +177,7 @@
     <ClCompile Include="src\app\rendering.ixx" />
     <ClCompile Include="src\world\scene.cpp" />
     <ClCompile Include="src\world\scene.ixx" />
-    <ClCompile Include="src\world\aabb.cpp" />
+    <ClCompile Include="src\world\collision\aabb.cpp" />
     <ClCompile Include="src\gl_wrapper\shader.cpp" />
     <ClCompile Include="src\gl_wrapper\shader.ixx" />
     <ClCompile Include="src\app\update_cycle.ixx" />

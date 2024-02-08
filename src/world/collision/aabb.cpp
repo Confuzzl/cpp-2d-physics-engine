@@ -27,4 +27,4 @@ std::array<glm::vec2, 4> AABB::corners() const {
   return {{min, {max.x, min.y}, max, {min.x, max.y}}};
 }
 
-glm::vec2 AABB::globalPos() const { return parent.globalPos(); }
+glm::vec2 AABB::globalPos() const { return parent.pos(); }

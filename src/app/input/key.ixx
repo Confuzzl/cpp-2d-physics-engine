@@ -6,8 +6,6 @@ import <functional>;
 export struct Key {
   using Callback = std::function<void(const double)>;
 
-  // static const Callback NONE;
-
   bool on = false;
   bool justUsed = false;
 

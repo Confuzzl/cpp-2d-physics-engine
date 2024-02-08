@@ -11,12 +11,12 @@ import math;
 
 struct ngon_opts {
   const unsigned char sides;
-  const double radius = 1;
+  const float radius = 1;
   const double offset = 0;
   const double mass = 1;
 };
 struct circle_opts {
-  const double radius = 1;
+  const float radius = 1;
   const double mass = 1;
 };
 struct obj_opts {
@@ -27,13 +27,17 @@ struct obj_opts {
 };
 
 export struct Object {
-  double mass;
+  struct phys_props {
 
-  glm::vec2 pos;
-  glm::vec2 velocity{};
+    glm::vec2 pos{};
+    glm::vec2 velocity{};
 
-  float rotation;
-  double angVelocity = 0;
+    float rotation = 0;
+    float angVelocity = 0;
+
+    double mass = 1;
+  } properties;
+  const phys_props &getProps() const { return properties; }
 
 private:
   glm::u8vec3 color;

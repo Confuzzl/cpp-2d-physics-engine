@@ -19,3 +19,9 @@ export std::vector<glm::vec2> ngonVertices(const unsigned char n,
   }
   return out;
 }
+
+export glm::vec2 vertexLocalToGlobal(const glm::vec2 &v, const glm::vec2 &t,
+                                     const float rot) {
+  const float sin = std::sinf(rot), cos = std::cosf(rot);
+  return glm::vec2{v.x * cos - v.y * sin, v.x * cos + v.y * sin} + t;
+}

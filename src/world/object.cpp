@@ -15,24 +15,18 @@ Object::Object(circle_opts &&opts, obj_opts &&obj_opts)
              std::move(obj_opts)) {}
 Object::Object(std::unique_ptr<Mesh> mesh, std::unique_ptr<Collider> collider,
                obj_opts &&opts)
-    : mesh{std::move(mesh)}, collider{std::move(collider)}, pos{opts.pos},
-      rotation{opts.rotation}, mass{opts.mass}, color{opts.color} {}
+    : mesh{std::move(mesh)}, collider{std::move(collider)}, /*pos{opts.pos},
+      rotation{opts.rotation}, mass{opts.mass}*/
+      properties{.pos = opts.pos, .rotation = opts.rotation, .mass = opts.mass},
+      color{opts.color} {}
 Object::~Object() = default;
 
 Object &Object::ngon(ngon_opts &&opts, obj_opts &&obj_opts) {
-  // auto pair = MAIN_SCENE.objects.emplace(
-  //    std::make_unique<Object>(std::move(opts), std::move(obj_opts)));
-  // auto &it = pair.first;
-  // return **it;
   return genericCreate(std::move(opts), std::move(obj_opts));
 }
 Object &Object::circle(circle_opts &&opts, obj_opts &&obj_opts) {
-  // auto pair = MAIN_SCENE.objects.emplace(
-  //     std::make_unique<Object>(std::move(opts), std::move(obj_opts)));
-  // auto &it = pair.first;
-  // return **it;
   return genericCreate(std::move(opts), std::move(obj_opts));
 }
 
-void Object::translate(const glm::vec2 &v) { pos += v; }
-void Object::rotate(const float r) { rotation += r; }
+void Object::translate(const glm::vec2 &v) { properties.pos += v; }
+void Object::rotate(const float r) { properties.rotation += r; }

@@ -7,18 +7,10 @@ module key;
 import app;
 import debug;
 
-// const Key::Callback Key::NONE{[]() {
-//   println("none initialized");
-//   return [](const double) {};
-// }()};
-
 Key::Key(const Callback &processJustOn, const Callback &processOn,
          const Callback &processJustOff, const Callback &processOff)
     : processJustOn{processJustOn}, processOn{processOn},
-      processJustOff{processJustOff}, processOff{processOff} {
-  // Key::NONE(0);
-  println("aaa");
-}
+      processJustOff{processJustOff}, processOff{processOff} {}
 Key::Key(const Callback &processOn, const Callback &processOff)
     : Key(processOn, processOn, processOff, processOff){};
 Key::Key(const Callback &processOn) : Key(processOn, NONE()) {}
