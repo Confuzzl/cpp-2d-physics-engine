@@ -18,7 +18,6 @@ struct QueryInfo {
     return normalA.value() * depth;
   }
 
-  // static QueryInfo
   static QueryInfo NONE() { return {}; }
 };
 } // namespace SAT
