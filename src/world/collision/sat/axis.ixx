@@ -3,6 +3,8 @@ export module axis;
 import glm;
 import math;
 
+export struct Polygon;
+
 export struct Axis {
   float minA = F_INF_POS, maxA = F_INF_NEG;
   float minB = F_INF_POS, maxB = F_INF_NEG;
@@ -17,4 +19,6 @@ export struct Axis {
 
   float depth() const;
   bool isIntersecting() const;
+
+  void projectPolygons(const Polygon &a, const Polygon &b);
 };

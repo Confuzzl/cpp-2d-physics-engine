@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\util\func.ixx" />
+    <ClCompile Include="src\util\vector.ixx" />
     <ClCompile Include="src\world\collision\aabb.ixx" />
     <ClCompile Include="src\app\app.cpp" />
     <ClCompile Include="src\app\app.ixx" />
@@ -153,8 +154,11 @@
     <ClCompile Include="src\gl_wrapper\buffer_objects.ixx" />
     <ClCompile Include="src\world\camera.cpp" />
     <ClCompile Include="src\world\camera.ixx" />
-    <ClCompile Include="src\world\collision\collider.cpp" />
-    <ClCompile Include="src\world\collision\collider.ixx" />
+    <ClCompile Include="src\world\collision\sat\sat_misc.ixx" />
+    <ClCompile Include="src\world\collision\shapes\circle.cpp" />
+    <ClCompile Include="src\world\collision\shapes\circle.ixx" />
+    <ClCompile Include="src\world\collision\shapes\collider.cpp" />
+    <ClCompile Include="src\world\collision\shapes\collider.ixx" />
     <ClCompile Include="src\util\debug.ixx" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\util\glm.ixx" />
@@ -168,6 +172,8 @@
     <ClCompile Include="src\world\collision\sat\polypoly.ixx" />
     <ClCompile Include="src\world\collision\sat\query_info.ixx" />
     <ClCompile Include="src\world\collision\sat\sat.ixx" />
+    <ClCompile Include="src\world\collision\shapes\polygon.cpp" />
+    <ClCompile Include="src\world\collision\shapes\polygon.ixx" />
     <ClCompile Include="src\world\mesh.ixx" />
     <ClCompile Include="src\world\object.cpp" />
     <ClCompile Include="src\world\object.ixx" />

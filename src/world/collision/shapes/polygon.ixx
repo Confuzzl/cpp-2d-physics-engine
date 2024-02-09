@@ -1,40 +1,17 @@
-export module collider;
+module;
 
+#include <ranges>
+
+export module polygon;
+
+import collider;
 import glm;
-
-export struct Object;
-
-import vector;
-import <optional>;
-import <memory>;
-
-// export struct AABB;
-import aabb;
-// not move constuctible if using incomplete uptr
-
 import poly;
+import vector;
 import query_info;
 
-struct Polygon;
-struct Circle;
-export struct Collider {
-  const Object &parent;
+export struct Circle;
 
-protected:
-  std::unique_ptr<AABB> aabb;
-  Collider(const Object &parent, std::unique_ptr<AABB> aabb);
-
-public:
-  const auto &props() const;
-  glm::vec2 pos() const;
-  float rot() const;
-
-  AABB &getAABB();
-
-  virtual SAT::QueryInfo reverseQuery(const Collider &other) const = 0;
-  virtual SAT::QueryInfo query(const Polygon &other) const = 0;
-  virtual SAT::QueryInfo query(const Circle &other) const = 0;
-};
 export struct Polygon : public Collider {
   struct vertex {
   private:
@@ -50,19 +27,39 @@ export struct Polygon : public Collider {
       return vertexLocalToGlobal(pos, parent.pos(), parent.rot());
     }
   };
+
   struct edge {
   private:
     const Polygon &parent;
     const vertex &tail, &head;
+    const glm::vec2 normal;
+
+    glm::vec2 calculateNormal() {
+      const glm::vec3 tail3{tail.localPos(), 0};
+      const glm::vec3 head3{head.localPos(), 0};
+      const glm::vec3 up{glm::cross(tail3, head3)};
+      const glm::vec3 this3{static_cast<glm::vec2>(*this), 0};
+      const glm::vec3 norm3{glm::cross(this3, up)};
+      return glm::normalize(glm::vec2{norm3.x, norm3.y});
+    }
 
   public:
     edge(const Polygon &parent, const vertex &tail, const vertex &head)
-        : parent{parent}, tail{tail}, head{head} {}
+        : parent{parent}, tail{tail}, head{head}, normal{calculateNormal()} {}
 
     glm::vec2 localTail() const { return tail.localPos(); }
     glm::vec2 localHead() const { return head.localPos(); }
     glm::vec2 globalTail() const { return localTail() + parent.pos(); }
     glm::vec2 globalHead() const { return localHead() + parent.pos(); }
+    const glm::vec2 &getNormal() const { return normal; }
+
+    operator glm::vec2() const { return head.localPos() - tail.localPos(); }
+
+    bool contains(const glm::vec2 &point) const {
+      return glm::distance(globalTail(), point) +
+                 glm::distance(point, globalHead()) ==
+             glm::length(static_cast<glm::vec2>(*this));
+    }
   };
 
 private:
@@ -75,31 +72,24 @@ private:
   Polygon(const Object &parent, const std::vector<glm::vec2> &points);
 
 public:
+  const unsigned char sides;
+
   static std::unique_ptr<Polygon> create(const Object &parent,
                                          const unsigned char n,
                                          const double radius,
                                          const double offset);
 
   const std::vector<vertex> &getVertices() const;
-  auto localVertices() const;
-  auto globalVertices() const;
+  auto localVertices() const {
+    return vertices |
+           std::views::transform([](const vertex &v) { return v.localPos(); });
+  }
+  auto globalVertices() const {
+    return vertices |
+           std::views::transform([](const vertex &v) { return v.globalPos(); });
+  }
 
-  SAT::QueryInfo reverseQuery(const Collider &other) const override;
-  SAT::QueryInfo query(const Polygon &other) const override;
-  SAT::QueryInfo query(const Circle &other) const override;
-};
-export struct Circle : public Collider {
-  const float radius = 1;
-
-private:
-  friend std::unique_ptr<Circle>
-  std::make_unique<Circle, const Object &, const float &>(const Object &,
-                                                          const float &);
-  Circle(const Object &parent, const float radius);
-
-public:
-  static std::unique_ptr<Circle> create(const Object &parent,
-                                        const float radius);
+  const std::vector<edge> &getEdges() const;
 
   SAT::QueryInfo reverseQuery(const Collider &other) const override;
   SAT::QueryInfo query(const Polygon &other) const override;

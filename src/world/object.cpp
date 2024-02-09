@@ -4,6 +4,9 @@ import debug;
 import scene;
 import app;
 
+import polygon;
+import circle;
+
 glm::uvec3 Object::getColor() const { return color; }
 
 Object::Object(ngon_opts &&opts, obj_opts &&obj_opts)

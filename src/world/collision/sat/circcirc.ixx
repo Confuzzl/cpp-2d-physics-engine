@@ -1,6 +1,6 @@
 export module circcirc;
 
-import collider;
+import circle;
 import query_info;
 import glm;
 
