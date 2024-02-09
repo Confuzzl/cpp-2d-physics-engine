@@ -8,7 +8,7 @@ glm::uvec3 Object::getColor() const { return color; }
 
 Object::Object(ngon_opts &&opts, obj_opts &&obj_opts)
     : Object(Mesh::ngon(opts.sides, opts.radius, opts.offset),
-             Convex::create(*this, opts.sides, opts.radius, opts.offset),
+             Polygon::create(*this, opts.sides, opts.radius, opts.offset),
              std::move(obj_opts)) {}
 Object::Object(circle_opts &&opts, obj_opts &&obj_opts)
     : Object(Mesh::circle(opts.radius), Circle::create(*this, opts.radius),

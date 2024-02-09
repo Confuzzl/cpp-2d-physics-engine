@@ -4,7 +4,7 @@ import glm;
 
 export struct Object;
 
-import <vector>;
+import vector;
 import <optional>;
 import <memory>;
 
@@ -15,7 +15,7 @@ import aabb;
 import poly;
 import query_info;
 
-struct Convex;
+struct Polygon;
 struct Circle;
 export struct Collider {
   const Object &parent;
@@ -32,17 +32,17 @@ public:
   AABB &getAABB();
 
   virtual SAT::QueryInfo reverseQuery(const Collider &other) const = 0;
-  virtual SAT::QueryInfo query(const Convex &other) const = 0;
+  virtual SAT::QueryInfo query(const Polygon &other) const = 0;
   virtual SAT::QueryInfo query(const Circle &other) const = 0;
 };
-export struct Convex : public Collider {
+export struct Polygon : public Collider {
   struct vertex {
   private:
-    const Convex &parent;
+    const Polygon &parent;
     const glm::vec2 pos;
 
   public:
-    vertex(const Convex &parent, const glm::vec2 &pos)
+    vertex(const Polygon &parent, const glm::vec2 &pos)
         : parent{parent}, pos{pos} {}
 
     const glm::vec2 &localPos() const { return pos; }
@@ -52,11 +52,11 @@ export struct Convex : public Collider {
   };
   struct edge {
   private:
-    const Convex &parent;
+    const Polygon &parent;
     const vertex &tail, &head;
 
   public:
-    edge(const Convex &parent, const vertex &tail, const vertex &head)
+    edge(const Polygon &parent, const vertex &tail, const vertex &head)
         : parent{parent}, tail{tail}, head{head} {}
 
     glm::vec2 localTail() const { return tail.localPos(); }
@@ -66,25 +66,26 @@ export struct Convex : public Collider {
   };
 
 private:
-  const std::vector<glm::vec2> vertices;
-  std::vector<vertex> vvv;
-  std::vector<edge> eee;
+  const std::vector<vertex> vertices;
+  const std::vector<edge> edges;
 
-  friend std::unique_ptr<Convex>
-  std::make_unique<Convex, const Object &, std::vector<glm::vec2>>(
+  friend std::unique_ptr<Polygon>
+  std::make_unique<Polygon, const Object &, std::vector<glm::vec2>>(
       const Object &, std::vector<glm::vec2> &&);
-  Convex(const Object &parent, std::vector<glm::vec2> &&vertices);
+  Polygon(const Object &parent, const std::vector<glm::vec2> &points);
 
 public:
-  static std::unique_ptr<Convex> create(const Object &parent,
-                                        const unsigned char n,
-                                        const double radius,
-                                        const double offset);
+  static std::unique_ptr<Polygon> create(const Object &parent,
+                                         const unsigned char n,
+                                         const double radius,
+                                         const double offset);
 
+  const std::vector<vertex> &getVertices() const;
+  auto localVertices() const;
   auto globalVertices() const;
 
   SAT::QueryInfo reverseQuery(const Collider &other) const override;
-  SAT::QueryInfo query(const Convex &other) const override;
+  SAT::QueryInfo query(const Polygon &other) const override;
   SAT::QueryInfo query(const Circle &other) const override;
 };
 export struct Circle : public Collider {
@@ -101,6 +102,6 @@ public:
                                         const float radius);
 
   SAT::QueryInfo reverseQuery(const Collider &other) const override;
-  SAT::QueryInfo query(const Convex &other) const override;
+  SAT::QueryInfo query(const Polygon &other) const override;
   SAT::QueryInfo query(const Circle &other) const override;
 };

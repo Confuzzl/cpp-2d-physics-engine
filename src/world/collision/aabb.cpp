@@ -15,6 +15,21 @@ import debug;
 AABB::AABB(const Collider &parent, const glm::vec2 &min, const glm::vec2 &max)
     : parent{parent}, min{min}, max{max},
       vbo{/*sharedVBO()*/ VBOHolder.get(4)} {}
+std::unique_ptr<AABB> AABB::from(const Collider &parent, const float radius) {
+  return std::make_unique<AABB>(parent, glm::vec2{-radius, -radius},
+                                glm::vec2{+radius, +radius});
+}
+std::unique_ptr<AABB> AABB::from(const Collider &parent,
+                                 const std::vector<glm::vec2> vertices) {
+  glm::vec2 min{F_INF_POS, F_INF_POS}, max{F_INF_NEG, F_INF_NEG};
+  for (const glm::vec2 &v : vertices) {
+    min.x = std::min(min.x, v.x);
+    max.x = std::max(max.x, v.x);
+    min.y = std::min(min.y, v.y);
+    max.y = std::max(max.y, v.y);
+  }
+  return std::make_unique<AABB>(parent, min, max);
+}
 
 void AABB::expand(const glm::vec2 &p) {
   min.x = std::min(min.x, p.x);
