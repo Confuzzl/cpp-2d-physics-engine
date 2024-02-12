@@ -59,6 +59,7 @@ void Renderer::renderFrame(const double t) const {
 
   renderText(t);
   renderScene(t);
+  renderGrid();
 
   glfwSwapBuffers(MAIN_APP.window);
 }
@@ -69,6 +70,9 @@ void Renderer::renderScene(const double t) const {
 }
 void Renderer::renderText(const double t) const {
   text(std::format("t: {:.2f}s", glfwGetTime()), 0, 0);
+  text(std::format("pos: {:+.2f} {:+.2f}", MAIN_CAMERA.getPos().x,
+                   MAIN_CAMERA.getPos().y),
+       0, 50);
   text(std::format("z: {:.2f}", MAIN_CAMERA.zoom), 0, 100);
 }
 
@@ -144,7 +148,7 @@ void Renderer::text(const std::string &str, const unsigned short x,
 import object;
 
 void Renderer::render(const Object &object, render_opts &&opts) const {
-  const Mesh &mesh = *object.mesh;
+  const Mesh &mesh = object.getMesh();
 
   glUseProgram(shapeShader.ID);
   glBindVertexArray(shapeShader.vao);
@@ -166,7 +170,7 @@ void Renderer::render(const Object &object, render_opts &&opts) const {
   glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
 
   if (opts.showAABB)
-    render(object.collider->getAABB(), object.getColor());
+    render(object.getCollider().getAABB(), object.getColor());
 }
 
 import aabb;
@@ -178,15 +182,53 @@ void Renderer::render(const AABB &aabb, const glm::uvec3 &color) const {
                             sizeof(glm::vec2));
 
   GLintptr offset = 0;
-  for (const glm::vec2 &vertex : aabb.corners()) {
+  for (const glm::vec2 &vertex : aabb.localVertices()) {
     glNamedBufferSubData(aabb.vbo.ID, offset, sizeof(vertex),
                          glm::value_ptr(vertex));
     offset += sizeof(vertex);
   }
-  shapeShader.setParentPos(aabb.parent.pos());
+  shapeShader.setParentPos(aabb.globalPos());
   shapeShader.setView(MAIN_SCENE.camera.getView());
 
   shapeShader.setFragColor(color);
 
   glDrawArrays(GL_LINE_LOOP, 0, 4);
+}
+
+void Renderer::renderGrid() const {
+  // static constexpr unsigned int SIZE = 3;
+  static constexpr int HALF_SIZE = 3;
+  static constexpr float WIDTH = 1;
+  static constexpr unsigned int AXIS_COUNT = 2 * (HALF_SIZE * 2 + 1);
+  static constexpr unsigned int VERTEX_COUNT = AXIS_COUNT * AXIS_COUNT;
+  static VBO<ShapeVertex> VBO{VERTEX_COUNT};
+  static const glm::vec2 AXES[]{{1.0f, 0.0f}, {0.0f, 1.0f}};
+
+  glUseProgram(shapeShader.ID);
+  glBindVertexArray(shapeShader.vao);
+  glVertexArrayVertexBuffer(shapeShader.vao, 0, VBO.ID, 0, sizeof(glm::vec2));
+
+  GLintptr offset = 0;
+  for (int a = 0; a < 2; a++) {
+    const glm::vec2 &axis = AXES[a];
+    const glm::vec2 &other = AXES[1 - a];
+    for (int i = -HALF_SIZE; i <= +HALF_SIZE; i++) {
+      const glm::vec2 perpOffset = other * static_cast<float>(i);
+
+      glNamedBufferSubData(
+          VBO.ID, offset, sizeof(glm::vec2),
+          glm::value_ptr(glm::vec2{axis * static_cast<float>(-HALF_SIZE)} +
+                         perpOffset));
+      offset += sizeof(glm::vec2);
+      glNamedBufferSubData(
+          VBO.ID, offset, sizeof(glm::vec2),
+          glm::value_ptr(glm::vec2{axis * static_cast<float>(+HALF_SIZE)} +
+                         perpOffset));
+      offset += sizeof(glm::vec2);
+    }
+  }
+  shapeShader.setParentPos({0, 0});
+  shapeShader.setView(MAIN_SCENE.camera.getView());
+  shapeShader.setFragColor({127, 127, 127});
+  glDrawArrays(GL_LINES, 0, VERTEX_COUNT);
 }

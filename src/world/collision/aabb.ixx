@@ -1,3 +1,7 @@
+module;
+
+#include <ranges>
+
 export module aabb;
 
 import glm;
@@ -21,8 +25,10 @@ private:
   glm::vec2 min{}, max{};
 
 public:
-  const glm::vec2 &getMin() const { return min; }
-  const glm::vec2 &getMax() const { return max; }
+  glm::vec2 localMin() const { return min; }
+  glm::vec2 globalMin() const { return min + globalPos(); }
+  glm::vec2 localMax() const { return max; }
+  glm::vec2 globalMax() const { return max + globalPos(); }
 
   AABB(const Collider &parent, const glm::vec2 &min = {F_INF_POS, F_INF_POS},
        const glm::vec2 &max = {F_INF_NEG, F_INF_NEG});
@@ -31,9 +37,16 @@ public:
   static std::unique_ptr<AABB> from(const Collider &parent,
                                     const std::vector<glm::vec2> vertices);
 
+  bool intersects(const AABB &other) const;
   void expand(const glm::vec2 &p);
 
-  std::array<glm::vec2, 4> corners() const;
+  std::array<glm::vec2, 4> localVertices() const;
+  // auto globalVertices() const {
+  //   return localVertices() |
+  //          std::views::transform([this](const glm::vec2 &vertex) {
+  //            return vertex + this->globalPos();
+  //          });
+  // }
 
   glm::vec2 globalPos() const;
 };

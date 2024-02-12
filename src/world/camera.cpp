@@ -11,9 +11,10 @@ const glm::vec2 &Camera::getPos() const { return pos; }
 void Camera::translate(const glm::vec2 &v) { pos += v; }
 
 glm::mat4 Camera::getView() const {
-  glm::mat4 out = glm::translate(proj, -glm::vec3{pos, 0});
+  glm::mat4 out = proj;
   out[0][0] *= zoom;
   out[1][1] *= zoom;
+  out = glm::translate(out, -glm::vec3{pos, 0});
   return out;
 }
 const glm::mat4 &Camera::getProj() const { return proj; }

@@ -48,4 +48,6 @@ public:
 
   void render(const Object &object, render_opts &&opts) const;
   void render(const AABB &aabb, const glm::uvec3 &color) const;
+
+  void renderGrid() const;
 };

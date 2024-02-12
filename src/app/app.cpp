@@ -66,6 +66,8 @@ void App::start() {
       updateCycle.pushCount();
       frameCycle.pushCount();
     }
+
+    // close();
   }
 }
 

@@ -29,7 +29,8 @@ public:
   glm::vec2 pos() const;
   float rot() const;
 
-  AABB &getAABB();
+  AABB &getAABB() { return *aabb; }
+  const AABB &getAABB() const { return *aabb; }
 
   virtual SAT::QueryInfo reverseQuery(const Collider &other) const = 0;
   virtual SAT::QueryInfo query(const Polygon &other) const = 0;

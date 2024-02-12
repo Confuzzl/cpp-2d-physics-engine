@@ -14,8 +14,9 @@ export struct Circle;
 
 export struct Polygon : public Collider {
   struct vertex {
-  private:
     const Polygon &parent;
+
+  private:
     const glm::vec2 pos;
 
   public:
@@ -29,8 +30,9 @@ export struct Polygon : public Collider {
   };
 
   struct edge {
-  private:
     const Polygon &parent;
+
+  private:
     const vertex &tail, &head;
     const glm::vec2 normal;
 

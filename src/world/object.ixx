@@ -41,12 +41,15 @@ export struct Object {
 
 private:
   glm::u8vec3 color;
+  std::unique_ptr<Mesh> mesh;
+  std::unique_ptr<Collider> collider;
 
 public:
   glm::uvec3 getColor() const;
-
-  std::unique_ptr<Mesh> mesh;
-  std::unique_ptr<Collider> collider;
+  Mesh &getMesh() { return *mesh; }
+  const Mesh &getMesh() const { return *mesh; }
+  Collider &getCollider() { return *collider; }
+  const Collider &getCollider() const { return *collider; }
 
   Object(ngon_opts &&opts, obj_opts &&obj_opts);
 

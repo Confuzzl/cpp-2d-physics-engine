@@ -31,6 +31,12 @@ std::unique_ptr<AABB> AABB::from(const Collider &parent,
   return std::make_unique<AABB>(parent, min, max);
 }
 
+bool AABB::intersects(const AABB &other) const {
+  const glm::vec2 tmin = globalMin(), tmax = globalMax(),
+                  omin = other.globalMin(), omax = other.globalMax();
+  return (tmin.x < omax.x && tmax.x > omax.x) &&
+         (tmin.y < omin.y && tmax.y > omax.y);
+}
 void AABB::expand(const glm::vec2 &p) {
   min.x = std::min(min.x, p.x);
   max.x = std::max(max.x, p.x);
@@ -38,7 +44,7 @@ void AABB::expand(const glm::vec2 &p) {
   max.y = std::max(max.y, p.y);
 }
 
-std::array<glm::vec2, 4> AABB::corners() const {
+std::array<glm::vec2, 4> AABB::localVertices() const {
   return {{min, {max.x, min.y}, max, {min.x, max.y}}};
 }
 
