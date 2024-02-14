@@ -25,7 +25,8 @@ export struct Polygon : public Collider {
 
     const glm::vec2 &localPos() const { return pos; }
     glm::vec2 globalPos() const {
-      return vertexLocalToGlobal(pos, parent.pos(), parent.rot());
+      // return vertexLocalToGlobal(pos, parent.pos(), parent.rot());
+      return pos + parent.pos();
     }
   };
 

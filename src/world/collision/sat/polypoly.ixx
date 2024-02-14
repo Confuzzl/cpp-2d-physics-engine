@@ -9,6 +9,9 @@ import query_info;
 import axis;
 import vector;
 
+import debug;
+import glm;
+
 export namespace SAT {
 struct depth_info_t {
   // const Polygon::edge &edge;

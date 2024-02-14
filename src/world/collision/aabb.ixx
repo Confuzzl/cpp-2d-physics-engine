@@ -41,12 +41,12 @@ public:
   void expand(const glm::vec2 &p);
 
   std::array<glm::vec2, 4> localVertices() const;
-  // auto globalVertices() const {
-  //   return localVertices() |
-  //          std::views::transform([this](const glm::vec2 &vertex) {
-  //            return vertex + this->globalPos();
-  //          });
-  // }
+  auto globalVertices() const {
+    return localVertices() |
+           std::views::transform([this](const glm::vec2 &vertex) {
+             return vertex + this->globalPos();
+           });
+  }
 
   glm::vec2 globalPos() const;
 };
