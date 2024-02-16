@@ -49,5 +49,8 @@ public:
   void render(const Object &object, render_opts &&opts) const;
   void render(const AABB &aabb, const glm::uvec3 &color) const;
 
-  void renderGrid() const;
+  void drawGrid() const;
+  void drawPoint(const glm::vec2 &point) const;
+  void drawLine(const glm::vec2 &a, const glm::vec2 &b) const;
+  void drawArrow(const glm::vec2 &origin, const glm::vec2 &direction) const;
 };
