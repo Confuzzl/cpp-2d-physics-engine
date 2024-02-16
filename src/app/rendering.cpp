@@ -13,6 +13,7 @@ module rendering;
 import <iostream>;
 import <format>;
 import <vector>;
+import <stdexcept>;
 
 import glm;
 import debug;
@@ -31,8 +32,14 @@ const glm::mat4 Renderer::UI_MATRIX{
 Renderer::Renderer() {}
 void Renderer::init() {
   initFontTexture();
-  shapeShader.create();
-  fontShader.create();
+  try {
+    shapeShader.create();
+    fontShader.create();
+    circleShader.create();
+  } catch (const std::runtime_error &e) {
+    println("{}", e.what());
+    MAIN_APP.close();
+  }
 }
 
 void Renderer::initFontTexture() {
@@ -57,8 +64,9 @@ void Renderer::renderFrame(const double t) const {
   glClearColor(0, 1, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  renderText(t);
-  renderScene(t);
+  // renderText(t);
+  // renderScene(t);
+  drawCircle({0, 0}, 1);
   drawGrid();
 
   glfwSwapBuffers(MAIN_APP.window);
@@ -125,7 +133,7 @@ void Renderer::text(const std::string &str, const unsigned short x,
     xOffset += static_cast<unsigned short>(CHAR_WIDTH * scale);
   }
 
-  VBO<FontVertex> vbo{vertexCount};
+  vbo<FontVertex> vbo{vertexCount};
 
   GLintptr offset = 0;
   for (const auto &vertex : vertices) {
@@ -189,8 +197,9 @@ void Renderer::render(const AABB &aabb, const glm::uvec3 &color) const {
   }
   shapeShader.setParentPos(aabb.globalPos());
   shapeShader.setView(MAIN_SCENE.camera.getView());
-
   shapeShader.setFragColor(color);
+
+  glLineWidth(1);
 
   glDrawArrays(GL_LINE_LOOP, 0, 4);
 }

@@ -26,6 +26,7 @@ export struct Renderer {
 
   ShapeShader shapeShader{};
   FontShader fontShader{};
+  CircleShader circleShader{};
 
   GLuint fontTexture = 0;
 
@@ -50,7 +51,15 @@ public:
   void render(const AABB &aabb, const glm::uvec3 &color) const;
 
   void drawGrid() const;
-  void drawPoint(const glm::vec2 &point) const;
-  void drawLine(const glm::vec2 &a, const glm::vec2 &b) const;
-  void drawArrow(const glm::vec2 &origin, const glm::vec2 &direction) const;
+
+  void drawPoint(const glm::vec2 &point,
+                 const glm::uvec3 &color = {255, 255, 255}) const;
+  void drawLine(const glm::vec2 &a, const glm::vec2 &b,
+                const glm::uvec3 &color = {255, 255, 255}) const;
+  void drawArrow(const glm::vec2 &origin, const glm::vec2 &vector,
+                 const glm::uvec3 &color = {255, 255, 255}) const;
+  void drawArrowFromTo(const glm::vec2 &from, const glm::vec2 &to,
+                       const glm::uvec3 &color = {255, 255, 255}) const;
+  void drawCircle(const glm::vec2 &center, const float radius,
+                  const glm::uvec3 &color = {255, 255, 255}) const;
 };

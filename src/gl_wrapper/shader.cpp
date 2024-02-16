@@ -48,13 +48,13 @@ void Shader::compileShader(const GLenum type, GLuint &ID,
   glGetShaderiv(ID, GL_COMPILE_STATUS, &success);
 
   if (!success) {
-    GLint length;
-    glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &length);
-    std::string log = "";
-    log.resize(length);
-    glGetShaderInfoLog(ID, length, NULL, log.data());
+    // GLint length;
+    // glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &length);
+    // std::string log = "";
+    // log.resize(length);
+    // glGetShaderInfoLog(ID, length, NULL, log.data());
     println("COMPILATION ERROR {}", source);
-    println(log);
+    // println(log);
     return;
   }
   println("{} {}", source, ID);
@@ -107,5 +107,21 @@ void ShapeShader::setView(const glm::mat4 &matrix) const {
   setUniform(view, matrix);
 }
 void ShapeShader::setFragColor(const glm::uvec3 &color) const {
+  setUniform(frag_color, color);
+}
+
+CircleShader::CircleShader() : Shader("circle") {}
+void CircleShader::createVAO() { glCreateVertexArrays(1, &vao); }
+void CircleShader::createUniforms() {
+  center.create(ID, "center");
+  radius.create(ID, "radius");
+  frag_color.create(ID, "frag_color");
+}
+
+void CircleShader::setCenter(const glm::vec2 &pos) const {
+  setUniform(center, pos);
+}
+void CircleShader::setRadius(const float r) const { setUniform(radius, r); }
+void CircleShader::setFragColor(const glm::uvec3 &color) const {
   setUniform(frag_color, color);
 }

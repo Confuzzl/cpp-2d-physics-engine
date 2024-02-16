@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\app\rendering_draw.cpp" />
     <ClCompile Include="src\util\func.ixx" />
     <ClCompile Include="src\util\variant.ixx" />
     <ClCompile Include="src\util\vector.ixx" />

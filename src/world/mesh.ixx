@@ -25,15 +25,15 @@ template <typename T> struct BufferHolder {
   }
 };
 
-export BufferHolder<VBO<ShapeVertex>> VBOHolder{};
-BufferHolder<RadialEBO> EBOHolder{};
+export BufferHolder<vbo<ShapeVertex>> VBOHolder{};
+BufferHolder<radial_ebo> EBOHolder{};
 
 export struct Mesh {
   static constexpr unsigned char SEGMENTS = 32;
 
   std::vector<ShapeVertex> localVertexData;
-  const VBO<ShapeVertex> &vbo;
-  const RadialEBO &ebo;
+  const vbo<ShapeVertex> &vbo;
+  const radial_ebo &ebo;
 
   Mesh(const std::vector<ShapeVertex> &data)
       : localVertexData{data},

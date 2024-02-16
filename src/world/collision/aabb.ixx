@@ -17,7 +17,7 @@ import <memory>;
 export struct Collider;
 
 export struct AABB {
-  const VBO<ShapeVertex> &vbo;
+  const vbo<ShapeVertex> &vbo;
 
   const Collider &parent;
 

@@ -96,3 +96,20 @@ public:
   void setView(const glm::mat4 &matrix) const;
   void setFragColor(const glm::uvec3 &color) const;
 };
+
+export struct CircleShader : public Shader {
+  uniform<glm::vec2> center;
+  uniform<float> radius;
+  uniform<glm::uvec3> frag_color;
+
+  CircleShader();
+
+private:
+  void createVAO() override;
+  void createUniforms() override;
+
+public:
+  void setCenter(const glm::vec2 &pos) const;
+  void setRadius(const float r) const;
+  void setFragColor(const glm::uvec3 &color) const;
+};

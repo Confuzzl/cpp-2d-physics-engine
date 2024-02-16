@@ -9,20 +9,29 @@ import <vector>;
 import <numeric>;
 import debug;
 
-struct BufferObject {
+struct gl_buffer_obj {
   GLuint ID;
-  BufferObject() { glCreateBuffers(1, &ID); }
+  gl_buffer_obj() { glCreateBuffers(1, &ID); }
 };
 
-export template <typename T> struct VBO : public BufferObject {
-  VBO(const unsigned int n) : BufferObject() {
+export template <typename T> struct vbo : public gl_buffer_obj {
+  vbo(const unsigned int n) : gl_buffer_obj() {
     glNamedBufferStorage(ID, n * sizeof(T), NULL, GL_DYNAMIC_STORAGE_BIT);
   }
 };
 
-export struct RadialEBO : public BufferObject {
+export struct simple_ebo : public gl_buffer_obj {
   const unsigned int count;
-  RadialEBO(const unsigned char n) : BufferObject(), count{n * 3u} {
+  simple_ebo(const std::vector<GLubyte> &indices)
+      : gl_buffer_obj(), count{static_cast<unsigned int>(indices.size())} {
+    glNamedBufferData(ID, count * sizeof(GLubyte), indices.data(),
+                      GL_STATIC_DRAW);
+  }
+};
+
+export struct radial_ebo : public gl_buffer_obj {
+  const unsigned int count;
+  radial_ebo(const unsigned char n) : gl_buffer_obj(), count{n * 3u} {
     std::vector<GLubyte> indices{};
     indices.reserve(count);
     for (int i = 0; i < n - 2; i++) {
