@@ -14,64 +14,68 @@ export struct Circle;
 
 export struct Polygon : public Collider {
   struct vertex_t {
-    const Polygon &parent;
-
   private:
-    const glm::vec2 pos;
+    glm::vec2 _pos;
 
   public:
-    vertex_t(const Polygon &parent, const glm::vec2 &pos)
-        : parent{parent}, pos{pos} {}
+    vertex_t(const glm::vec2 &pos) : _pos{pos} {}
 
-    const glm::vec2 &localPos() const { return pos; }
-    glm::vec2 globalPos() const {
-      return vertexLocalToGlobal(pos, parent.pos(), parent.rot());
-    }
+    glm::vec2 pos() const { return _pos; }
   };
 
   struct edge_t {
-    const Polygon &parent;
-
   private:
-    const vertex_t &tail, &head;
+    const std::vector<glm::vec2> &vertices;
+    const unsigned char tailIndex, headIndex;
 
   public:
-    edge_t(const Polygon &parent, const vertex_t &tail, const vertex_t &head)
-        : parent{parent}, tail{tail}, head{head} {}
+    edge_t(const std::vector<glm::vec2> &vertices,
+           const unsigned char tailIndex, const unsigned char headIndex)
+        : vertices{vertices}, tailIndex{tailIndex}, headIndex{headIndex} {}
 
-    glm::vec2 localTail() const { return tail.localPos(); }
-    glm::vec2 localHead() const { return head.localPos(); }
-    glm::vec2 globalTail() const { return tail.globalPos(); }
-    glm::vec2 globalHead() const { return head.globalPos(); }
-    glm::vec2 getNormal() const { return glm::normalize(cwPerp(*this)); }
+    glm::vec2 tail() const { return; }
+    glm::vec2 head() const { return; }
+    glm::vec2 getNormal() const {
+      return glm::normalize(cwPerp(static_cast<glm::vec2>(*this)));
+    }
 
-    operator glm::vec2() const { return head.globalPos() - tail.globalPos(); }
+    explicit operator glm::vec2() const {
+      return vertices[headIndex] - vertices[tailIndex];
+    }
 
     bool contains(const glm::vec2 &point) const {
-      return glm::distance(globalTail(), point) +
-                 glm::distance(point, globalHead()) ==
+      return glm::distance(tail(), point) + glm::distance(point, head()) ==
              glm::length(static_cast<glm::vec2>(*this));
     }
   };
 
-private:
-  const std::vector<vertex_t> vertices;
-  const std::vector<edge_t> edges;
+  // private:
+  std::vector<vertex_t> vertices;
+  std::vector<edge_t> edges;
 
-  friend std::unique_ptr<Polygon>
-  std::make_unique<Polygon, const Object &, std::vector<glm::vec2>>(
-      const Object &, std::vector<glm::vec2> &&);
-  Polygon(const Object &parent, const std::vector<glm::vec2> &points);
+  // friend std::unique_ptr<Polygon>
+  // std::make_unique<Polygon, const Object &, std::vector<glm::vec2>>(
+  //     const Object &, std::vector<glm::vec2> &&);
 
-public:
-  const unsigned char sides;
+  Polygon(const glm::vec2 &pos, const float r, std::vector<glm::vec2> &&points);
 
-  static std::unique_ptr<Polygon> create(const Object &parent,
-                                         const unsigned char n,
-                                         const double radius,
-                                         const double offset);
+  struct opts_t {
+    unsigned char n;
+    float r = 1;
+    float offset = 0;
+  };
+  static Polygon New(const opts_t &opts, const glm::vec2 pos = {0, 0},
+                     const float r);
 
-  const std::vector<vertex_t> &getVertices() const;
+  // public:
+  //   const unsigned char sides;
+  //
+  //   static std::unique_ptr<Polygon> create(const Object &parent,
+  //                                          const unsigned char n,
+  //                                          const double radius,
+  //                                          const double offset);
+
+  // const std::vector<vertex_t> &getVertices() const;
   auto localVertices() const {
     return vertices | std::views::transform(
                           [](const vertex_t &v) { return v.localPos(); });

@@ -5,11 +5,11 @@ import math;
 
 export struct aabb_t {
 private:
-  glm::vec2 min{F_INF_POS, F_INF_POS}, max{F_INF_NEG, F_INF_NEG};
+  glm::vec2 _min{F_INF_POS, F_INF_POS}, _max{F_INF_NEG, F_INF_NEG};
 
 public:
-  glm::vec2 min() const { return min; }
-  glm::vec2 max() const { return max; }
+  glm::vec2 min() const { return _min; }
+  glm::vec2 max() const { return _max; }
 
   aabb_t() = default;
   aabb_t(const glm::vec2 &min, const glm::vec2 &max);
