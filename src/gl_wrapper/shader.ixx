@@ -6,8 +6,12 @@ export module shader;
 
 import <stdexcept>;
 
+import <vector>;
+
 import debug;
 import glm;
+
+import buffer_objects;
 
 template <typename T> struct uniform {
   GLint location;
@@ -21,23 +25,40 @@ template <typename T> struct uniform {
   }
 };
 
-export struct Shader {
+export namespace shader {
+export struct base_t {
   GLuint ID;
   GLuint vao;
 
-  const std::string name;
+  // const std::string name;
 
 protected:
-  Shader(const std::string &name);
+  base_t(const std::string &vert, const std::string &frag);
 
 private:
+  std::string vert, frag;
+
   void createShaders();
   void compileShader(const GLenum type, GLuint &ID, const std::string &source);
   virtual void createVAO() = 0;
   virtual void createUniforms() = 0;
 
 public:
-  void create();
+  void init();
+
+  void use() const {
+    glUseProgram(ID);
+    glBindVertexArray(vao);
+  }
+  template <typename T> void use(const vbo<T> &vbo) const {
+    use();
+    glVertexArrayVertexBuffer(vao, 0, vbo.ID, 0, sizeof(T));
+  }
+  template <typename T, typename E>
+  void use(const vbo<T> &vbo, const E &ebo) const {
+    use(vbo);
+    glVertexArrayElementBuffer(vao, ebo.ID);
+  }
 
   template <typename T>
   void setUniform(const uniform<T> &uniform, const T &value) const;
@@ -63,53 +84,91 @@ public:
   }
 };
 
-export struct FontShader : public Shader {
-  uniform<glm::mat4> projection;
-  uniform<glm::uvec3> font_color;
+export struct font_t : public base_t {
+  uniform<glm::mat4> view;
+  uniform<glm::uvec3> color;
 
-  FontShader();
+  font_t();
 
 private:
   void createVAO() override;
   void createUniforms() override;
 
 public:
-  void setProjection(const glm::mat4 &matrix) const;
-  void setFontColor(const glm::uvec3 &color) const;
+  const font_t &setView(const glm::mat4 &matrix) const;
+  const font_t &setFontColor(const glm::uvec3 &col) const;
 };
 
-export struct ShapeShader : public Shader {
+export struct basic_t : public base_t {
+  uniform<glm::mat4> view;
+  uniform<glm::uvec3> frag_color;
+
+  basic_t();
+
+private:
+  void createVAO() override;
+  void createUniforms() override;
+
+public:
+  const basic_t &setView(const glm::mat4 &matrix) const;
+  const basic_t &setFragColor(const glm::uvec3 &color) const;
+};
+using ui_t = basic_t;
+
+export struct shape_t : public base_t {
   uniform<glm::vec2> parent_pos;
   uniform<float> rotation;
   uniform<glm::mat4> view;
   uniform<glm::uvec3> frag_color;
 
-  ShapeShader();
+  shape_t();
 
 private:
   void createVAO() override;
   void createUniforms() override;
 
 public:
-  void setParentPos(const glm::vec2 &pos) const;
-  void setRotation(const float value) const;
-  void setView(const glm::mat4 &matrix) const;
-  void setFragColor(const glm::uvec3 &color) const;
+  const shape_t &setParentPos(const glm::vec2 &pos) const;
+  const shape_t &setRotation(const float value) const;
+  const shape_t &setView(const glm::mat4 &matrix) const;
+  const shape_t &setFragColor(const glm::uvec3 &color) const;
 };
 
-export struct CircleShader : public Shader {
+export struct circle_t : public base_t {
   uniform<glm::vec2> center;
   uniform<float> radius;
+
+  uniform<glm::vec2> screen_dimensions;
+  uniform<glm::mat4> view;
+
   uniform<glm::uvec3> frag_color;
 
-  CircleShader();
+  circle_t();
 
 private:
   void createVAO() override;
   void createUniforms() override;
 
 public:
-  void setCenter(const glm::vec2 &pos) const;
-  void setRadius(const float r) const;
-  void setFragColor(const glm::uvec3 &color) const;
+  const circle_t &setCenter(const glm::vec2 &pos) const;
+  const circle_t &setRadius(const float r) const;
+  const circle_t &setScreenDimensions(const glm::vec2 &dimensions) const;
+  const circle_t &setView(const glm::mat4 &matrix) const;
+  const circle_t &setFragColor(const glm::uvec3 &color) const;
 };
+
+inline namespace holder {
+shader::font_t font{};
+shader::basic_t basic{};
+shader::shape_t shape{};
+shader::circle_t circle{};
+
+std::vector<base_t *> shaders{&font, &basic, &shape, &circle};
+
+void init() {
+  for (base_t *ref : shaders) {
+    ref->init();
+  }
+}
+} // namespace holder
+} // namespace shader

@@ -126,10 +126,10 @@
     <ClCompile Include="src\util\math.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\rendering.cpp">
+    <ClCompile Include="src\app\rendering\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\rendering.ixx">
+    <ClCompile Include="src\app\rendering\renderer.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\world\scene.cpp">
@@ -153,7 +153,40 @@
     <ClCompile Include="src\util\variant.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\app\rendering_draw.cpp">
+    <ClCompile Include="src\app\cursor.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\cursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\rendering\gui\gui_frame.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\rendering\gui\window.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gl_wrapper\texture.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gl_wrapper\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util\color.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\rendering\gui\gui_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\rendering\gui\window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\rendering\world_frame.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\rendering\world_frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\collision\partition\quadtree\quadtree.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

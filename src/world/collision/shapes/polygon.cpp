@@ -5,16 +5,16 @@ import circle;
 
 Polygon::Polygon(const Object &parent, const std::vector<glm::vec2> &points)
     : Collider(parent,
-               /*std::make_unique<AABB>(*this)*/ AABB::from(*this, points)),
-      vertices{func::map<glm::vec2, vertex>(points,
-                                            [this](const glm::vec2 &v) {
-                                              return vertex{*this, v};
-                                            })},
-      edges{func::map<vertex, edge>(
+               /*std::make_unique<AABB>(*this)*/ aabb_t::from(*this, points)),
+      vertices{func::map<glm::vec2, vertex_t>(points,
+                                              [this](const glm::vec2 &v) {
+                                                return vertex_t{*this, v};
+                                              })},
+      edges{func::map<vertex_t, edge_t>(
           vertices,
-          [this](const vertex &v, const int i,
-                 const std::vector<vertex> &vertices) {
-            return edge{*this, v, vertices[(i + 1) % vertices.size()]};
+          [this](const vertex_t &v, const int i,
+                 const std::vector<vertex_t> &vertices) {
+            return edge_t{*this, v, vertices[(i + 1) % vertices.size()]};
           })},
       sides{static_cast<unsigned char>(points.size())} {}
 std::unique_ptr<Polygon> Polygon::create(const Object &parent,
@@ -25,7 +25,7 @@ std::unique_ptr<Polygon> Polygon::create(const Object &parent,
                                    std::move(ngonVertices(n, radius, offset)));
 }
 
-const std::vector<Polygon::vertex> &Polygon::getVertices() const {
+const std::vector<Polygon::vertex_t> &Polygon::getVertices() const {
   return vertices;
 }
 // auto Polygon::localVertices() const {
@@ -38,7 +38,7 @@ const std::vector<Polygon::vertex> &Polygon::getVertices() const {
 //          });
 // }
 
-const std::vector<Polygon::edge> &Polygon::getEdges() const { return edges; }
+const std::vector<Polygon::edge_t> &Polygon::getEdges() const { return edges; }
 
 import polypoly;
 import polycirc;

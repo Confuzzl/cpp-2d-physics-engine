@@ -7,7 +7,7 @@ Circle::Circle(const Object &parent, const float radius)
     : Collider(parent, /*
                 std::make_unique<AABB>(*this, glm::vec2{-radius, -radius},
                                        glm::vec2{+radius, +radius})*/
-               AABB::from(*this, radius)),
+               aabb_t::from(*this, radius)),
       radius{radius} {}
 std::unique_ptr<Circle> Circle::create(const Object &parent,
                                        const float radius) {

@@ -13,50 +13,39 @@ import query_info;
 export struct Circle;
 
 export struct Polygon : public Collider {
-  struct vertex {
+  struct vertex_t {
     const Polygon &parent;
 
   private:
     const glm::vec2 pos;
 
   public:
-    vertex(const Polygon &parent, const glm::vec2 &pos)
+    vertex_t(const Polygon &parent, const glm::vec2 &pos)
         : parent{parent}, pos{pos} {}
 
     const glm::vec2 &localPos() const { return pos; }
     glm::vec2 globalPos() const {
-      // return vertexLocalToGlobal(pos, parent.pos(), parent.rot());
-      return pos + parent.pos();
+      return vertexLocalToGlobal(pos, parent.pos(), parent.rot());
     }
   };
 
-  struct edge {
+  struct edge_t {
     const Polygon &parent;
 
   private:
-    const vertex &tail, &head;
-    const glm::vec2 normal;
-
-    glm::vec2 calculateNormal() {
-      const glm::vec3 tail3{tail.localPos(), 0};
-      const glm::vec3 head3{head.localPos(), 0};
-      const glm::vec3 up{glm::cross(tail3, head3)};
-      const glm::vec3 this3{static_cast<glm::vec2>(*this), 0};
-      const glm::vec3 norm3{glm::cross(this3, up)};
-      return glm::normalize(glm::vec2{norm3.x, norm3.y});
-    }
+    const vertex_t &tail, &head;
 
   public:
-    edge(const Polygon &parent, const vertex &tail, const vertex &head)
-        : parent{parent}, tail{tail}, head{head}, normal{calculateNormal()} {}
+    edge_t(const Polygon &parent, const vertex_t &tail, const vertex_t &head)
+        : parent{parent}, tail{tail}, head{head} {}
 
     glm::vec2 localTail() const { return tail.localPos(); }
     glm::vec2 localHead() const { return head.localPos(); }
-    glm::vec2 globalTail() const { return localTail() + parent.pos(); }
-    glm::vec2 globalHead() const { return localHead() + parent.pos(); }
-    const glm::vec2 &getNormal() const { return normal; }
+    glm::vec2 globalTail() const { return tail.globalPos(); }
+    glm::vec2 globalHead() const { return head.globalPos(); }
+    glm::vec2 getNormal() const { return glm::normalize(cwPerp(*this)); }
 
-    operator glm::vec2() const { return head.localPos() - tail.localPos(); }
+    operator glm::vec2() const { return head.globalPos() - tail.globalPos(); }
 
     bool contains(const glm::vec2 &point) const {
       return glm::distance(globalTail(), point) +
@@ -66,8 +55,8 @@ export struct Polygon : public Collider {
   };
 
 private:
-  const std::vector<vertex> vertices;
-  const std::vector<edge> edges;
+  const std::vector<vertex_t> vertices;
+  const std::vector<edge_t> edges;
 
   friend std::unique_ptr<Polygon>
   std::make_unique<Polygon, const Object &, std::vector<glm::vec2>>(
@@ -82,17 +71,17 @@ public:
                                          const double radius,
                                          const double offset);
 
-  const std::vector<vertex> &getVertices() const;
+  const std::vector<vertex_t> &getVertices() const;
   auto localVertices() const {
-    return vertices |
-           std::views::transform([](const vertex &v) { return v.localPos(); });
+    return vertices | std::views::transform(
+                          [](const vertex_t &v) { return v.localPos(); });
   }
   auto globalVertices() const {
-    return vertices |
-           std::views::transform([](const vertex &v) { return v.globalPos(); });
+    return vertices | std::views::transform(
+                          [](const vertex_t &v) { return v.globalPos(); });
   }
 
-  const std::vector<edge> &getEdges() const;
+  const std::vector<edge_t> &getEdges() const;
 
   SAT::QueryInfo reverseQuery(const Collider &other) const override;
   SAT::QueryInfo query(const Polygon &other) const override;

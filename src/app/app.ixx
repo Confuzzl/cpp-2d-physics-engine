@@ -9,6 +9,7 @@ import <memory>;
 import update_cycle;
 import scene;
 import rendering;
+import cursor;
 
 export struct App {
   static constexpr GLsizei WIDTH = 1280, HEIGHT = 720;
@@ -21,14 +22,12 @@ export struct App {
   UpdateCycle frameCycle;
   unsigned int seconds = 0;
 
-  Renderer renderer{};
+  CursorHolder cursors{};
 
   Scene scene{};
 
   App();
   ~App();
-
-  // void catchException(const std::runtime_error &e);
 
   void start();
   void startUpdate(const double t);

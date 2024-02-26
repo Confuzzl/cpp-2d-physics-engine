@@ -19,4 +19,4 @@ glm::mat4 Camera::getView() const {
 }
 const glm::mat4 &Camera::getProj() const { return proj; }
 
-float Camera::relSpeed() const { return speed * zoom; }
+float Camera::relSpeed() const { return speed /** zoom*/; }

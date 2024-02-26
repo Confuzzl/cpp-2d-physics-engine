@@ -9,6 +9,8 @@ import app;
 
 import math;
 
+import color;
+
 struct ngon_opts {
   const unsigned char sides;
   const float radius = 1;
@@ -40,19 +42,18 @@ export struct Object {
   const phys_props &getProps() const { return properties; }
 
 private:
-  glm::u8vec3 color;
   std::unique_ptr<Mesh> mesh;
   std::unique_ptr<Collider> collider;
 
 public:
-  glm::uvec3 getColor() const;
+  color_t color;
+
   Mesh &getMesh() { return *mesh; }
   const Mesh &getMesh() const { return *mesh; }
   Collider &getCollider() { return *collider; }
   const Collider &getCollider() const { return *collider; }
 
   Object(ngon_opts &&opts, obj_opts &&obj_opts);
-
   Object(circle_opts &&opts, obj_opts &&obj_opts);
   Object(std::unique_ptr<Mesh> mesh, std::unique_ptr<Collider> collider,
          obj_opts &&opts);

@@ -143,7 +143,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\app\rendering_draw.cpp" />
+    <ClCompile Include="src\app\cursor.cpp" />
+    <ClCompile Include="src\app\cursor.ixx" />
+    <ClCompile Include="src\app\rendering\gui\gui_frame.cpp" />
+    <ClCompile Include="src\app\rendering\gui\gui_frame.ixx" />
+    <ClCompile Include="src\app\rendering\gui\window.cpp" />
+    <ClCompile Include="src\app\rendering\gui\window.ixx" />
+    <ClCompile Include="src\app\rendering\world_frame.ixx" />
+    <ClCompile Include="src\app\rendering\world_frame.cpp" />
+    <ClCompile Include="src\gl_wrapper\texture.cpp" />
+    <ClCompile Include="src\gl_wrapper\texture.ixx" />
+    <ClCompile Include="src\util\color.ixx" />
     <ClCompile Include="src\util\func.ixx" />
     <ClCompile Include="src\util\variant.ixx" />
     <ClCompile Include="src\util\vector.ixx" />
@@ -156,6 +166,7 @@
     <ClCompile Include="src\gl_wrapper\buffer_objects.ixx" />
     <ClCompile Include="src\world\camera.cpp" />
     <ClCompile Include="src\world\camera.ixx" />
+    <ClCompile Include="src\world\collision\partition\quadtree\quadtree.ixx" />
     <ClCompile Include="src\world\collision\sat\sat_misc.ixx" />
     <ClCompile Include="src\world\collision\shapes\circle.cpp" />
     <ClCompile Include="src\world\collision\shapes\circle.ixx" />
@@ -181,8 +192,8 @@
     <ClCompile Include="src\world\object.ixx" />
     <ClCompile Include="src\util\poly.ixx" />
     <ClCompile Include="src\util\math.ixx" />
-    <ClCompile Include="src\app\rendering.cpp" />
-    <ClCompile Include="src\app\rendering.ixx" />
+    <ClCompile Include="src\app\rendering\renderer.cpp" />
+    <ClCompile Include="src\app\rendering\renderer.ixx" />
     <ClCompile Include="src\world\scene.cpp" />
     <ClCompile Include="src\world\scene.ixx" />
     <ClCompile Include="src\world\collision\aabb.cpp" />

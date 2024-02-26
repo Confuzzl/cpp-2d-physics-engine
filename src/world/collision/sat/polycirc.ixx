@@ -10,7 +10,7 @@ export namespace SAT {
 QueryInfo queryPolyCirc(const Polygon &polygon, const Circle &circle,
                         const bool reverse) {
   QueryInfo out{};
-  for (const Polygon::edge &edge : polygon.getEdges()) {
+  for (const Polygon::edge_t &edge : polygon.getEdges()) {
     const auto info = edgeCircleQuery(edge, circle);
     if (!(circle.contains(edge.globalTail()) ||
           circle.contains(edge.globalHead()))) {

@@ -7,8 +7,6 @@ import app;
 import polygon;
 import circle;
 
-glm::uvec3 Object::getColor() const { return color; }
-
 Object::Object(ngon_opts &&opts, obj_opts &&obj_opts)
     : Object(Mesh::ngon(opts.sides, opts.radius, opts.offset),
              Polygon::create(*this, opts.sides, opts.radius, opts.offset),

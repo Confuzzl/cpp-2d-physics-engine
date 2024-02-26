@@ -4,7 +4,7 @@ import object;
 
 import debug;
 
-Collider::Collider(const Object &parent, std::unique_ptr<AABB> aabb)
+Collider::Collider(const Object &parent, std::unique_ptr<aabb_t> aabb)
     : parent{parent}, aabb{std::move(aabb)} {}
 
 const auto &Collider::props() const { return parent.properties; }

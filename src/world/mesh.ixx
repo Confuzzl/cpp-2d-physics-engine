@@ -25,28 +25,27 @@ template <typename T> struct BufferHolder {
   }
 };
 
-export BufferHolder<vbo<ShapeVertex>> VBOHolder{};
+export BufferHolder<vbo<vertex::simple>> VBOHolder{};
 BufferHolder<radial_ebo> EBOHolder{};
 
 export struct Mesh {
   static constexpr unsigned char SEGMENTS = 32;
 
-  std::vector<ShapeVertex> localVertexData;
-  const vbo<ShapeVertex> &vbo;
+  std::vector<vertex::simple> localVertexData;
+  const vbo<vertex::simple> &vbo;
   const radial_ebo &ebo;
 
-  Mesh(const std::vector<ShapeVertex> &data)
+  Mesh(const std::vector<vertex::simple> &data)
       : localVertexData{data},
         vbo{VBOHolder.get(static_cast<unsigned char>(data.size()))},
         ebo{EBOHolder.get(static_cast<unsigned char>(data.size()))} {}
 
   static std::unique_ptr<Mesh> ngon(const unsigned char n, const double radius,
                                     const double offset) {
-    std::vector<ShapeVertex> data{};
+    std::vector<vertex::simple> data{};
     data.reserve(n + 1);
     data.emplace_back(0.0f, 0.0f);
-    const auto poly = ngonVertices(n, radius, offset);
-    for (const auto &vertex : poly)
+    for (const auto &vertex : ngonVertices(n, radius, offset))
       data.emplace_back(vertex.x, vertex.y);
     return std::make_unique<Mesh>(data);
   }

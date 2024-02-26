@@ -1,4 +1,5 @@
 #version 460 core
+
 layout (location = 0) in vec2 pos;
 
 uniform vec2 parent_pos = vec2(0.0, 0.0);

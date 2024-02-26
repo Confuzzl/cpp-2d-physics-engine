@@ -25,7 +25,7 @@ struct edge_circle_query_t {
   const glm::vec2 circlePoint;
   const float depth;
 };
-edge_circle_query_t edgeCircleQuery(const Polygon::edge &edge,
+edge_circle_query_t edgeCircleQuery(const Polygon::edge_t &edge,
                                     const Circle &circle) {
   const auto &[point, distance] =
       linePointQuery(edge.globalTail(), edge, edge.getNormal(), circle.pos());
