@@ -1,6 +1,6 @@
 module scene;
 
-// import object;
+import object;
 
 Scene::Scene() {}
 Scene::~Scene() = default;

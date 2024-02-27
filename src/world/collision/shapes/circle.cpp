@@ -3,7 +3,7 @@ module circle;
 import aabb;
 import polygon;
 
-Circle::Circle(const glm::vec2 &pos, const float r, const const float radius)
+Circle::Circle(const glm::vec2 &pos, const float r, const float radius)
     : Collider(aabb_t{}, pos, r), radius{radius} {}
 // std::unique_ptr<Circle> Circle::create(const Object &parent,
 //                                        const float radius) {

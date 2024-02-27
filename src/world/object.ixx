@@ -1,3 +1,7 @@
+module;
+
+#include "util/gl.h"
+
 export module object;
 
 import glm;
@@ -29,6 +33,12 @@ export struct base_obj_t {
 
   base_obj_t(const float mass, const glm::vec2 &velocity,
              const float angVelocity, Mesh &&mesh, const color_t &color);
+
+  struct render_opts_t {
+    bool showAABB = false;
+    GLenum primitive = GL_TRIANGLES;
+  };
+  virtual void draw(const render_opts_t &opts) const = 0;
 };
 
 template <typename colltype> struct object_t;
@@ -41,6 +51,8 @@ export template <> struct object_t<Polygon> : base_obj_t, Polygon {
   static object_t<Polygon> &New(const Polygon::opts_t &poly_opts,
                                 const base_obj_t::phys_opts_t &phys_opts = {},
                                 const color_t color = colors::WHITE);
+
+  void draw(const render_opts_t &opts) const override;
 };
 export template <> struct object_t<Circle> : base_obj_t, Circle {
   object_t(const glm::vec2 &pos, const float r, const float radius,
@@ -50,6 +62,8 @@ export template <> struct object_t<Circle> : base_obj_t, Circle {
   static object_t<Circle> &New(const float radius = 1,
                                const base_obj_t::phys_opts_t &phys_opts = {},
                                const color_t color = colors::WHITE);
+
+  void draw(const render_opts_t &opts) const override;
 };
 
 // struct ngon_opts {

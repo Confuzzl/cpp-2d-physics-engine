@@ -6,15 +6,15 @@ import circle;
 Polygon::Polygon(const glm::vec2 &pos, const float r,
                  std::vector<glm::vec2> &&points)
     : Collider(aabb_t{}, pos, r),
-      vertices{func::map<glm::vec2, vertex_t>(
-          points, [this](const glm::vec2 &v) { return vertex_t{v}; })},
-      edges{func::map<vertex_t, edge_t>(
+      sides{static_cast<unsigned char>(points.size())},
+      vertices{/*func::map<glm::vec2, vertex_t>(
+          points, [](const glm::vec2 &v) { return vertex_t{v}; })*/std::move(points)},
+      edges{/*func::map<vertex_t, edge_t>(
           vertices,
           [this](const vertex_t &v, const int i,
                  const std::vector<vertex_t> &vertices) {
             return edge_t{v, vertices[(i + 1) % vertices.size()]};
-          })},
-      sides{static_cast<unsigned char>(points.size())} {}
+          })*/} {}
 
 Polygon Polygon::New(const opts_t &opts, const glm::vec2 pos, const float r) {
   return {pos, r, ngonVertices(opts.n, opts.r, opts.offset)};

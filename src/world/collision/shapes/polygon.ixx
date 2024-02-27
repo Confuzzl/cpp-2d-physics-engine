@@ -15,25 +15,19 @@ import <functional>;
 export struct Circle;
 
 export struct Polygon : public Collider {
-  struct vertex_t {
-  private:
-    glm::vec2 _pos;
-
-  public:
-    vertex_t(const glm::vec2 &pos) : _pos{pos} {}
-
-    glm::vec2 pos() const { return _pos; }
-  };
+  using vertex_t = glm::vec2;
 
   struct edge_t {
   private:
-    const std::vector<glm::vec2> &vertices;
-    const unsigned char tailIndex, headIndex;
+    const std::vector<vertex_t> *vertices;
+    const glm::vec2 *parentPos;
+
+    unsigned char tailIndex, headIndex;
 
   public:
-    edge_t(const std::vector<glm::vec2> &vertices,
-           const unsigned char tailIndex, const unsigned char headIndex)
-        : vertices{vertices}, tailIndex{tailIndex}, headIndex{headIndex} {}
+    edge_t(const Polygon *parent, const unsigned char tailIndex,
+           const unsigned char headIndex)
+        : vertices{}, tailIndex{tailIndex}, headIndex{headIndex} {}
 
     glm::vec2 tail() const { return {}; }
     glm::vec2 head() const { return {}; }
@@ -51,6 +45,7 @@ export struct Polygon : public Collider {
     }
   };
 
+  const unsigned char sides;
   // private:
   std::vector<vertex_t> vertices;
   std::vector<edge_t> edges;
@@ -59,7 +54,6 @@ export struct Polygon : public Collider {
   // std::make_unique<Polygon, const Object &, std::vector<glm::vec2>>(
   //     const Object &, std::vector<glm::vec2> &&);
 
-  const unsigned char sides;
   Polygon(const glm::vec2 &pos, const float r, std::vector<glm::vec2> &&points);
 
   struct opts_t {
@@ -70,17 +64,17 @@ export struct Polygon : public Collider {
   static Polygon New(const opts_t &opts, const glm::vec2 pos = {0, 0},
                      const float r = 0);
 
-  auto newVerticesView() const {
+  using global_view_t = std::ranges::transform_view<
+      std::ranges::ref_view<const std::vector<vertex_t>>,
+      std::function<glm::vec2(const vertex_t &)>>;
+  global_view_t newVerticesView() const {
     const glm::vec2 offset = pos();
-    return vertices | std::views::transform([offset](const vertex_t &v) {
-             return v.pos() + offset;
-           });
+    return vertices |
+           std::views::transform(std::function<glm::vec2(const vertex_t &)>{
+               [offset](const vertex_t &v) { return v + offset; }});
   }
-  // decltype(std::declval<Polygon>().newVerticesView())
-  //     // std::invoke_result_t<decltype(&Polygon::newVerticesView())>
-  //     verticesView;
-  // auto globalVertices() { return verticesView; }
-  auto globalVertices() const { return newVerticesView(); }
+  // global_view_t
+  global_view_t globalVertices() const { return newVerticesView(); }
 
   void updateAABB(const glm::vec2 &v) override {}
   void updateAABB(const float r) override {}
@@ -91,3 +85,5 @@ export struct Polygon : public Collider {
   SAT::QueryInfo query(const Polygon &other) const override;
   SAT::QueryInfo query(const Circle &other) const override;
 };
+
+constexpr bool a = std::is_move_assignable<Polygon::edge_t>::value;
