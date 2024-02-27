@@ -12,8 +12,7 @@ QueryInfo queryPolyCirc(const Polygon &polygon, const Circle &circle,
   QueryInfo out{};
   for (const Polygon::edge_t &edge : polygon.getEdges()) {
     const auto info = edgeCircleQuery(edge, circle);
-    if (!(circle.contains(edge.globalTail()) ||
-          circle.contains(edge.globalHead()))) {
+    if (!(circle.contains(edge.tail()) || circle.contains(edge.head()))) {
       if (!edge.contains(info.edgePoint))
         continue;
       const float distance2 = glm::distance2(info.edgePoint, circle.pos());

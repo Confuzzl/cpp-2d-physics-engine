@@ -16,7 +16,9 @@ private:
   glm::vec2 position{};
   float rotation = 0;
 
-  virtual void updateAABB() = 0;
+  // virtual void updateAABB() = 0;
+  virtual void updateAABB(const glm::vec2 &v) = 0;
+  virtual void updateAABB(const float r) = 0;
 
 public:
   Collider(aabb_t &&aabb, const glm::vec2 &pos, const float rot);

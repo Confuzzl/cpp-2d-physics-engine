@@ -13,12 +13,16 @@ export struct Circle : public Collider {
   //   friend std::unique_ptr<Circle>
   //   std::make_unique<Circle, const Object &, const float &>(const Object &,
   //                                                           const float &);
-  Circle(const float radius);
+  Circle(const glm::vec2 &pos, const float r, const float radius);
 
 public:
   // static std::unique_ptr<Circle> create(const Object &parent,
   //                                       const float radius);
-  static Circle New(const float radius);
+  static Circle New(const float radius = 1, const glm::vec2 &pos = {0, 0},
+                    const float r = 0);
+
+  void updateAABB(const glm::vec2 &v) override {}
+  void updateAABB(const float r) override {}
 
   bool contains(const glm::vec2 &point) const;
 

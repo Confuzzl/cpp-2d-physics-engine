@@ -28,7 +28,8 @@ struct edge_circle_query_t {
 edge_circle_query_t edgeCircleQuery(const Polygon::edge_t &edge,
                                     const Circle &circle) {
   const auto &[point, distance] =
-      linePointQuery(edge.globalTail(), edge, edge.getNormal(), circle.pos());
+      linePointQuery(edge.tail(), static_cast<glm::vec2>(edge),
+                     edge.getNormal(), circle.pos());
   const float depth = signum(distance) * (std::abs(distance) - circle.radius);
   return {.edgePoint = point,
           .circlePoint = point + edge.getNormal() * depth,

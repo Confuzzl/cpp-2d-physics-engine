@@ -6,14 +6,14 @@ import camera;
 import <set>;
 import <memory>;
 
-export struct Object;
+// export struct Object;
 export struct base_obj_t;
 
 export struct Scene {
   Camera camera{{0, 0}, 1};
 
-  std::set<std::unique_ptr<Object>> objects;
-  // std::set<std::unique_ptr<base_obj_t>> objs{};
+  // std::set<std::unique_ptr<Object>> objects;
+  std::set<std::unique_ptr<base_obj_t>> objs{};
 
   Scene();
   ~Scene();

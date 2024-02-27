@@ -14,7 +14,7 @@ import glm;
 
 export namespace SAT {
 struct depth_info_t {
-  // const Polygon::edge &edge;
+  const Polygon *parent;
   const Polygon::edge_t *edge;
   Axis axis;
 };
@@ -27,7 +27,8 @@ PROJECTION_STATE projectToDepths(const Polygon &a, const Polygon &b,
     axis.projectPolygons(a, b);
     if (!axis.isIntersecting())
       return PROJECTION_STATE::NONE;
-    depths.emplace_back(depth_info_t{.edge = &edge, .axis = std::move(axis)});
+    depths.emplace_back(
+        depth_info_t{.parent = &a, .edge = &edge, .axis = std::move(axis)});
   }
   return PROJECTION_STATE::INTERSECTION;
 }
@@ -50,7 +51,7 @@ QueryInfo queryPolyPoly(const Polygon &a, const Polygon &b) {
   return QueryInfo{.collision = true,
                    .pointA = {},
                    .pointB = {},
-                   .normalA = &best.edge->parent == &a
+                   .normalA = best.parent == &a
                                   ? best.edge->getNormal()
                                   : best.edge->getNormal() * -1.0f};
 }

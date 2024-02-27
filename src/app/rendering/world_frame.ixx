@@ -18,8 +18,8 @@ struct frame {
     bool showAABB = false;
     GLenum primitive = GL_TRIANGLES;
   };
-  void drawObject(const Object &object, render_opts &&opts) const;
-  void drawAABB(const aabb_t &aabb, const color_t &color) const;
+  // void drawObject(const Object &object, render_opts &&opts) const;
+  // void drawAABB(const aabb_t &aabb, const color_t &color) const;
 
   void drawGrid() const;
 

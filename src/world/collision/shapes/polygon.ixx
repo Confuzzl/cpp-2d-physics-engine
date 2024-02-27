@@ -10,6 +10,8 @@ import poly;
 import vector;
 import query_info;
 
+import <functional>;
+
 export struct Circle;
 
 export struct Polygon : public Collider {
@@ -33,8 +35,8 @@ export struct Polygon : public Collider {
            const unsigned char tailIndex, const unsigned char headIndex)
         : vertices{vertices}, tailIndex{tailIndex}, headIndex{headIndex} {}
 
-    glm::vec2 tail() const { return; }
-    glm::vec2 head() const { return; }
+    glm::vec2 tail() const { return {}; }
+    glm::vec2 head() const { return {}; }
     glm::vec2 getNormal() const {
       return glm::normalize(cwPerp(static_cast<glm::vec2>(*this)));
     }
@@ -57,6 +59,7 @@ export struct Polygon : public Collider {
   // std::make_unique<Polygon, const Object &, std::vector<glm::vec2>>(
   //     const Object &, std::vector<glm::vec2> &&);
 
+  const unsigned char sides;
   Polygon(const glm::vec2 &pos, const float r, std::vector<glm::vec2> &&points);
 
   struct opts_t {
@@ -65,25 +68,22 @@ export struct Polygon : public Collider {
     float offset = 0;
   };
   static Polygon New(const opts_t &opts, const glm::vec2 pos = {0, 0},
-                     const float r);
+                     const float r = 0);
 
-  // public:
-  //   const unsigned char sides;
-  //
-  //   static std::unique_ptr<Polygon> create(const Object &parent,
-  //                                          const unsigned char n,
-  //                                          const double radius,
-  //                                          const double offset);
+  auto newVerticesView() const {
+    const glm::vec2 offset = pos();
+    return vertices | std::views::transform([offset](const vertex_t &v) {
+             return v.pos() + offset;
+           });
+  }
+  // decltype(std::declval<Polygon>().newVerticesView())
+  //     // std::invoke_result_t<decltype(&Polygon::newVerticesView())>
+  //     verticesView;
+  // auto globalVertices() { return verticesView; }
+  auto globalVertices() const { return newVerticesView(); }
 
-  // const std::vector<vertex_t> &getVertices() const;
-  auto localVertices() const {
-    return vertices | std::views::transform(
-                          [](const vertex_t &v) { return v.localPos(); });
-  }
-  auto globalVertices() const {
-    return vertices | std::views::transform(
-                          [](const vertex_t &v) { return v.globalPos(); });
-  }
+  void updateAABB(const glm::vec2 &v) override {}
+  void updateAABB(const float r) override {}
 
   const std::vector<edge_t> &getEdges() const;
 

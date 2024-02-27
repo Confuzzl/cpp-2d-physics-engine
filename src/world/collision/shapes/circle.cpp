@@ -3,15 +3,14 @@ module circle;
 import aabb;
 import polygon;
 
-Circle::Circle(const Object &parent, const float radius)
-    : Collider(parent, /*
-                std::make_unique<AABB>(*this, glm::vec2{-radius, -radius},
-                                       glm::vec2{+radius, +radius})*/
-               aabb_t::from(*this, radius)),
-      radius{radius} {}
-std::unique_ptr<Circle> Circle::create(const Object &parent,
-                                       const float radius) {
-  return std::make_unique<Circle>(parent, radius);
+Circle::Circle(const glm::vec2 &pos, const float r, const const float radius)
+    : Collider(aabb_t{}, pos, r), radius{radius} {}
+// std::unique_ptr<Circle> Circle::create(const Object &parent,
+//                                        const float radius) {
+//   return std::make_unique<Circle>(parent, radius);
+// }
+Circle Circle::New(const float radius, const glm::vec2 &pos, const float r) {
+  return {pos, r, radius};
 }
 
 bool Circle::contains(const glm::vec2 &point) const {

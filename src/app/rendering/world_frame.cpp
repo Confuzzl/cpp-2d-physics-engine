@@ -13,37 +13,38 @@ import buffer_objects;
 import vertices;
 
 void world::frame::render() const {
-  for (const std::unique_ptr<Object> &obj : MAIN_SCENE.objects) {
-    drawObject(*obj, {.showAABB = true});
-  }
+  // for (const std::unique_ptr<Object> &obj : MAIN_SCENE.objects) {
+  //   drawObject(*obj, {.showAABB = true});
+  // }
 }
 
-void world::frame::drawObject(const Object &object, render_opts &&opts) const {
-
-  const Mesh &mesh = object.getMesh();
-
-  shader::shape.use(mesh.vbo, mesh.ebo);
-
-  GLintptr offset = 0;
-  for (const vertex::simple &vertex : mesh.localVertexData) {
-    glNamedBufferSubData(mesh.vbo.ID, offset, sizeof(vertex),
-                         glm::value_ptr(vertex.pos));
-    offset += sizeof(vertex);
-  }
-
-  shader::shape.setParentPos(object.properties.pos)
-      .setRotation(object.properties.rotation)
-      .setView(MAIN_SCENE.camera.getView())
-      .setFragColor(object.color);
-
-  glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
-
-  if (opts.showAABB)
-    drawAABB(object.getCollider().getAABB(), object.color);
-}
-void world::frame::drawAABB(const aabb_t &aabb, const color_t &color) const {
-  drawBoxFromToFixed(aabb.globalMin(), aabb.globalMax(), 5, color);
-}
+// void world::frame::drawObject(const Object &object, render_opts &&opts) const
+// {
+//
+//   const Mesh &mesh = object.getMesh();
+//
+//   shader::shape.use(mesh.vbo, mesh.ebo);
+//
+//   GLintptr offset = 0;
+//   for (const vertex::simple &vertex : mesh.localVertexData) {
+//     glNamedBufferSubData(mesh.vbo.ID, offset, sizeof(vertex),
+//                          glm::value_ptr(vertex.pos));
+//     offset += sizeof(vertex);
+//   }
+//
+//   shader::shape.setParentPos(object.properties.pos)
+//       .setRotation(object.properties.rotation)
+//       .setView(MAIN_SCENE.camera.getView())
+//       .setFragColor(object.color);
+//
+//   glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
+//
+//   if (opts.showAABB)
+//     drawAABB(object.getCollider().getAABB(), object.color);
+// }
+// void world::frame::drawAABB(const aabb_t &aabb, const color_t &color) const {
+//   drawBoxFromToFixed(aabb.min(), aabb.max(), 5, color);
+// }
 
 void world::frame::drawGrid() const {
   static constexpr int HALF_SIZE = 10;
