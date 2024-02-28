@@ -45,14 +45,12 @@ export struct Polygon : public Collider {
   };
 
   const unsigned char sides;
-  // private:
+
+private:
   std::vector<vertex_t> vertices;
   std::vector<edge_t> edges;
 
-  // friend std::unique_ptr<Polygon>
-  // std::make_unique<Polygon, const Object &, std::vector<glm::vec2>>(
-  //     const Object &, std::vector<glm::vec2> &&);
-
+public:
   Polygon(const glm::vec2 &pos, const float r, std::vector<glm::vec2> &&points);
 
   struct opts_t {
@@ -63,6 +61,7 @@ export struct Polygon : public Collider {
   static Polygon New(const opts_t &opts, const glm::vec2 pos = {0, 0},
                      const float r = 0);
 
+private:
   using global_view_t = std::ranges::transform_view<
       std::ranges::ref_view<const std::vector<vertex_t>>,
       std::function<glm::vec2(const vertex_t &)>>;
@@ -72,11 +71,14 @@ export struct Polygon : public Collider {
            std::views::transform(std::function<glm::vec2(const vertex_t &)>{
                [offset](const vertex_t &v) { return v + offset; }});
   }
-  // global_view_t
-  global_view_t globalVertices() const { return newVerticesView(); }
+  global_view_t globalVertexView;
+  void updateGlobalVertexView() { globalVertexView = newVerticesView(); }
 
-  void updateAABB(const glm::vec2 &v) override {}
-  void updateAABB(const float r) override {}
+public:
+  const global_view_t &globalVertices() const { return globalVertexView; }
+
+  void translateAABB(const glm::vec2 &offset) override;
+  void refreshAABB() override;
 
   const std::vector<edge_t> &getEdges() const;
 
@@ -84,5 +86,3 @@ export struct Polygon : public Collider {
   SAT::QueryInfo query(const Polygon &other) const override;
   SAT::QueryInfo query(const Circle &other) const override;
 };
-
-constexpr bool a = std::is_move_assignable<Polygon::edge_t>::value;

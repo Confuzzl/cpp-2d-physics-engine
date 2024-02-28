@@ -7,6 +7,10 @@ import app;
 import polygon;
 import circle;
 
+base_obj_t::base_obj_t(const float mass, const glm::vec2 &velocity,
+                       const float angVelocity, const color_t &color)
+    : mass{mass}, velocity{velocity}, angVelocity{angVelocity}, color{color} {}
+
 // Object::Object(ngon_opts &&opts, obj_opts &&obj_opts)
 //     : Object(Mesh::ngon(opts.sides, opts.radius, opts.offset),
 //              Polygon::create(*this, opts.sides, opts.radius, opts.offset),

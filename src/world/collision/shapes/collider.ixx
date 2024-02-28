@@ -11,15 +11,13 @@ export struct Circle;
 
 export struct Collider {
 private:
-  // fat aabb ? aabb_t fat;
-
   aabb_t aabb;
   glm::vec2 position{};
   float rotation = 0;
 
 protected:
-  virtual void updateAABB(const glm::vec2 &v) = 0;
-  virtual void updateAABB(const float r) = 0;
+  virtual void translateAABB(const glm::vec2 &offset) = 0;
+  virtual void refreshAABB() = 0;
 
 public:
   Collider(aabb_t &&aabb, const glm::vec2 &pos, const float rot);

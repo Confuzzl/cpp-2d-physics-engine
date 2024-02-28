@@ -8,14 +8,18 @@ import glm;
 import <memory>;
 
 import mesh;
-// import collider;
+import poly;
 import circle;
 import polygon;
 import app;
-
 import math;
-
+import scene;
 import color;
+import func;
+import rendering;
+import world_frame;
+import camera;
+import shader;
 
 export struct base_obj_t {
   struct phys_opts_t {
@@ -28,105 +32,86 @@ export struct base_obj_t {
   glm::vec2 velocity{};
   float angVelocity = 0;
 
-  Mesh mesh;
   color_t color = colors::WHITE;
 
   base_obj_t(const float mass, const glm::vec2 &velocity,
-             const float angVelocity, Mesh &&mesh, const color_t &color);
+             const float angVelocity, const color_t &color);
 
   struct render_opts_t {
     bool showAABB = false;
     GLenum primitive = GL_TRIANGLES;
   };
-  virtual void draw(const render_opts_t &opts) const = 0;
+  virtual void draw(const render_opts_t &opts = {}) const = 0;
 };
 
 template <typename colltype> struct object_t;
 
 export template <> struct object_t<Polygon> : base_obj_t, Polygon {
+  Mesh mesh;
+
   object_t(const glm::vec2 &pos, const float r, std::vector<glm::vec2> &&points,
            const float mass, const glm::vec2 &velocity, const float angVelocity,
-           Mesh &&mesh, const color_t &color);
+           Mesh &&mesh, const color_t &color)
+      : base_obj_t(mass, velocity, angVelocity, color),
+        Polygon(pos, r, std::move(points)), mesh{std::move(mesh)} {}
 
   static object_t<Polygon> &New(const Polygon::opts_t &poly_opts,
+                                const glm::vec2 pos = {0, 0}, const float r = 0,
                                 const base_obj_t::phys_opts_t &phys_opts = {},
-                                const color_t color = colors::WHITE);
+                                const color_t color = colors::WHITE) {
+    std::vector<glm::vec2> vertices =
+        ngonVertices(poly_opts.n, poly_opts.r, poly_opts.offset);
+    Mesh mesh{
+        func::map<glm::vec2, vertex::simple>(vertices, [](const glm::vec2 &v) {
+          return vertex::simple{v.x, v.y};
+        })};
+    auto it =
+        MAIN_SCENE.objs
+            .emplace(std::make_unique<object_t<Polygon>>(
+                pos, r, std::move(vertices), phys_opts.mass, phys_opts.velocity,
+                phys_opts.angVelocity, std::move(mesh), color))
+            .first;
+    return static_cast<object_t<Polygon> &>(**it);
+  }
 
-  void draw(const render_opts_t &opts) const override;
+  void draw(const render_opts_t &opts = {}) const override {
+    shader::shape.use(mesh.vbo, mesh.ebo);
+
+    GLintptr offset = 0;
+    for (const vertex::simple &vertex : mesh.localVertexData) {
+      glNamedBufferSubData(mesh.vbo.ID, offset, sizeof(vertex),
+                           glm::value_ptr(vertex.pos));
+      offset += sizeof(vertex);
+    }
+
+    shader::shape.setParentPos(pos())
+        .setRotation(rot())
+        .setView(MAIN_SCENE.camera.getView())
+        .setFragColor(color);
+
+    glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
+  }
 };
 export template <> struct object_t<Circle> : base_obj_t, Circle {
   object_t(const glm::vec2 &pos, const float r, const float radius,
            const float mass, const glm::vec2 &velocity, const float angVelocity,
-           Mesh &&mesh, const color_t &color);
+           const color_t &color)
+      : base_obj_t(mass, velocity, angVelocity, color), Circle(pos, r, radius) {
+  }
 
   static object_t<Circle> &New(const float radius = 1,
+                               const glm::vec2 &pos = {0, 0}, const float r = 0,
                                const base_obj_t::phys_opts_t &phys_opts = {},
-                               const color_t color = colors::WHITE);
+                               const color_t color = colors::WHITE) {
+    auto it = MAIN_SCENE.objs
+                  .emplace(std::make_unique<object_t<Circle>>(
+                      pos, r, radius, phys_opts.mass, phys_opts.velocity,
+                      phys_opts.angVelocity, color))
+                  .first;
+    return static_cast<object_t<Circle> &>(**it);
+  }
 
-  void draw(const render_opts_t &opts) const override;
+  void draw(const render_opts_t &opts = {}) const override {
+    MAIN_RENDERER.worldFrame.drawCircle(pos(), radius, color);
+  }
 };
-
-// struct ngon_opts {
-//   const unsigned char sides;
-//   const float radius = 1;
-//   const double offset = 0;
-//   const double mass = 1;
-// };
-//  struct circle_opts {
-//    const float radius = 1;
-//    const double mass = 1;
-//  };
-//  struct obj_opts {
-//    const glm::vec2 pos{};
-//    const float rotation = 0;
-//    const double mass = 1;
-//    const glm::u8vec3 color = randomColor();
-//  };
-//
-//  export struct Object {
-//    struct phys_props {
-//
-//      glm::vec2 pos{};
-//      glm::vec2 velocity{};
-//
-//      float rotation = 0;
-//      float angVelocity = 0;
-//
-//      double mass = 1;
-//    } properties;
-//    const phys_props &getProps() const { return properties; }
-//
-//  private:
-//    std::unique_ptr<Mesh> mesh;
-//    std::unique_ptr<Collider> collider;
-//
-//  public:
-//    color_t color;
-//
-//    Mesh &getMesh() { return *mesh; }
-//    const Mesh &getMesh() const { return *mesh; }
-//    Collider &getCollider() { return *collider; }
-//    const Collider &getCollider() const { return *collider; }
-//
-//    Object(ngon_opts &&opts, obj_opts &&obj_opts);
-//    Object(circle_opts &&opts, obj_opts &&obj_opts);
-//    Object(std::unique_ptr<Mesh> mesh, std::unique_ptr<Collider> collider,
-//           obj_opts &&opts);
-//    ~Object();
-//
-//    static Object &ngon(ngon_opts &&opts, obj_opts &&obj_opts);
-//    static Object &circle(circle_opts &&opts, obj_opts &&obj_opts);
-//
-//  private:
-//    template <typename shape_opts_t>
-//    static Object &genericCreate(shape_opts_t &&opts, obj_opts &&obj_opts) {
-//      auto pair = MAIN_SCENE.objects.emplace(
-//          std::make_unique<Object>(std::move(opts), std::move(obj_opts)));
-//      auto &it = pair.first;
-//      return **it;
-//    }
-//
-//  public:
-//    void translate(const glm::vec2 &v);
-//    void rotate(const float r);
-//  };
