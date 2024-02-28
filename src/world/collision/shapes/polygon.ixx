@@ -19,25 +19,24 @@ export struct Polygon : public Collider {
 
   struct edge_t {
   private:
-    const std::vector<vertex_t> *vertices;
-    const glm::vec2 *parentPos;
+    const Polygon *_parent;
 
     unsigned char tailIndex, headIndex;
 
   public:
     edge_t(const Polygon *parent, const unsigned char tailIndex,
            const unsigned char headIndex)
-        : vertices{}, tailIndex{tailIndex}, headIndex{headIndex} {}
+        : _parent{parent}, tailIndex{tailIndex}, headIndex{headIndex} {}
 
-    glm::vec2 tail() const { return {}; }
-    glm::vec2 head() const { return {}; }
+    const Polygon *parent() const { return _parent; }
+
+    glm::vec2 tail() const { return _parent->globalVertices()[tailIndex]; }
+    glm::vec2 head() const { return _parent->globalVertices()[headIndex]; }
     glm::vec2 getNormal() const {
       return glm::normalize(cwPerp(static_cast<glm::vec2>(*this)));
     }
 
-    explicit operator glm::vec2() const {
-      return vertices[headIndex] - vertices[tailIndex];
-    }
+    explicit operator glm::vec2() const { return head() - tail(); }
 
     bool contains(const glm::vec2 &point) const {
       return glm::distance(tail(), point) + glm::distance(point, head()) ==

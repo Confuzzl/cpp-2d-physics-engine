@@ -8,13 +8,15 @@ Polygon::Polygon(const glm::vec2 &pos, const float r,
     : Collider(aabb_t{}, pos, r),
       sides{static_cast<unsigned char>(points.size())},
       vertices{/*func::map<glm::vec2, vertex_t>(
-          points, [](const glm::vec2 &v) { return vertex_t{v}; })*/std::move(points)},
-      edges{/*func::map<vertex_t, edge_t>(
-          vertices,
-          [this](const vertex_t &v, const int i,
-                 const std::vector<vertex_t> &vertices) {
-            return edge_t{v, vertices[(i + 1) % vertices.size()]};
-          })*/} {}
+          points, [](const glm::vec2 &v) { return vertex_t{v}; })*/
+               std::move(points)},
+      edges{func::map<vertex_t, edge_t>(
+          vertices, [this](const vertex_t &v, const int i,
+                           const std::vector<vertex_t> &vertices) {
+            return edge_t{
+                this, static_cast<unsigned char>(i),
+                static_cast<unsigned char>((i + 1) % vertices.size())};
+          })} {}
 
 Polygon Polygon::New(const opts_t &opts, const glm::vec2 pos, const float r) {
   return {pos, r, ngonVertices(opts.n, opts.r, opts.offset)};
