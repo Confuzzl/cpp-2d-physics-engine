@@ -11,11 +11,31 @@ import aabb;
 import shader;
 import buffer_objects;
 import vertices;
+import mesh;
 
 void world::frame::render() const {
   for (const std::unique_ptr<base_obj_t> &obj : MAIN_SCENE.objs) {
     obj->draw();
   }
+}
+
+void world::frame::drawMesh(const Mesh &mesh, const glm::vec2 &pos,
+                            const float rot, const color_t &color) const {
+  shader::shape.use(mesh.vbo, mesh.ebo);
+
+  GLintptr offset = 0;
+  for (const vertex::simple &vertex : mesh.localVertexData) {
+    glNamedBufferSubData(mesh.vbo.ID, offset, sizeof(vertex),
+                         glm::value_ptr(vertex.pos));
+    offset += sizeof(vertex);
+  }
+
+  shader::shape.setParentPos(pos)
+      .setRotation(rot)
+      .setView(MAIN_SCENE.camera.getView())
+      .setFragColor(color);
+
+  glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
 }
 
 void world::frame::drawGrid() const {

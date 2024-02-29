@@ -75,21 +75,7 @@ export template <> struct object_t<Polygon> : base_obj_t, Polygon {
   }
 
   void draw(const render_opts_t &opts = {}) const override {
-    shader::shape.use(mesh.vbo, mesh.ebo);
-
-    GLintptr offset = 0;
-    for (const vertex::simple &vertex : mesh.localVertexData) {
-      glNamedBufferSubData(mesh.vbo.ID, offset, sizeof(vertex),
-                           glm::value_ptr(vertex.pos));
-      offset += sizeof(vertex);
-    }
-
-    shader::shape.setParentPos(pos())
-        .setRotation(rot())
-        .setView(MAIN_SCENE.camera.getView())
-        .setFragColor(color);
-
-    glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
+    MAIN_RENDERER.worldFrame.drawMesh(mesh, pos(), rot(), color);
   }
 };
 export template <> struct object_t<Circle> : base_obj_t, Circle {

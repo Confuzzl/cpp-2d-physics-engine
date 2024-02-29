@@ -7,8 +7,7 @@ export module world_frame;
 import glm;
 import color;
 
-export struct Object;
-export struct aabb_t;
+export struct Mesh;
 
 export namespace world {
 struct frame {
@@ -20,6 +19,9 @@ struct frame {
   };
   // void drawObject(const Object &object, render_opts &&opts) const;
   // void drawAABB(const aabb_t &aabb, const color_t &color) const;
+
+  void drawMesh(const Mesh &mesh, const glm::vec2 &pos, const float rot,
+                const color_t &color) const;
 
   void drawGrid() const;
 
