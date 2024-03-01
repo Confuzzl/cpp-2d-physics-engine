@@ -78,7 +78,7 @@ public:
   const global_view_t &globalVertices() const { return globalVertexView; }
 
   void translateAABB(const glm::vec2 &offset) override;
-  void refreshAABB() override;
+  void setRotateAABB() override;
 
   const std::vector<edge_t> &getEdges() const;
 

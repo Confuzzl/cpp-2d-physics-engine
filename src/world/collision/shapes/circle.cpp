@@ -5,13 +5,13 @@ import polygon;
 
 Circle::Circle(const glm::vec2 &pos, const float r, const float radius)
     : Collider(aabb_t::circ_con(pos, radius), pos, r), radius{radius} {}
-// std::unique_ptr<Circle> Circle::create(const Object &parent,
-//                                        const float radius) {
-//   return std::make_unique<Circle>(parent, radius);
-// }
+
 Circle Circle::New(const float radius, const glm::vec2 &pos, const float r) {
   return {pos, r, radius};
 }
+
+void Circle::translateAABB(const glm::vec2 &offset) { aabb.translate(offset); }
+void Circle::setRotateAABB() {}
 
 bool Circle::contains(const glm::vec2 &point) const {
   const float distance2 = glm::distance2(pos(), point);

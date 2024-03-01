@@ -16,5 +16,5 @@ float Collider::rot() const { return rotation; }
 void Collider::rotate(const float r) { setRot(rotation + r); }
 void Collider::setRot(const float r) {
   rotation = r;
-  refreshAABB();
+  setRotateAABB();
 }

@@ -21,8 +21,8 @@ public:
   static Circle New(const float radius = 1, const glm::vec2 &pos = {0, 0},
                     const float r = 0);
 
-  void translateAABB(const glm::vec2 &offset) override {}
-  void refreshAABB() override {}
+  void translateAABB(const glm::vec2 &offset) override;
+  void setRotateAABB() override;
 
   bool contains(const glm::vec2 &point) const;
 

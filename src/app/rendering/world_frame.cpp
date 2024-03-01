@@ -20,7 +20,8 @@ void world::frame::render() const {
 }
 
 void world::frame::drawMesh(const Mesh &mesh, const glm::vec2 &pos,
-                            const float rot, const color_t &color) const {
+                            const float rot, const color_t &color,
+                            const GLenum primitive) const {
   shader::shape.use(mesh.vbo, mesh.ebo);
 
   GLintptr offset = 0;
@@ -35,7 +36,7 @@ void world::frame::drawMesh(const Mesh &mesh, const glm::vec2 &pos,
       .setView(MAIN_SCENE.camera.getView())
       .setFragColor(color);
 
-  glDrawElements(opts.primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
+  glDrawElements(primitive, mesh.ebo.count, GL_UNSIGNED_BYTE, 0);
 }
 
 void world::frame::drawGrid() const {

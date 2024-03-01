@@ -23,11 +23,11 @@ Polygon Polygon::New(const opts_t &opts, const glm::vec2 pos, const float r) {
 }
 
 void Polygon::translateAABB(const glm::vec2 &offset) {
-  getAABB().translate(offset);
+  aabb.translate(offset);
   updateGlobalVertexView();
 }
-void Polygon::refreshAABB() {
-  getAABB() = aabb_t::poly_con(pos(), rot(), vertices);
+void Polygon::setRotateAABB() {
+  aabb = aabb_t::poly_con(pos(), rot(), vertices);
 }
 
 const std::vector<Polygon::edge_t> &Polygon::getEdges() const { return edges; }

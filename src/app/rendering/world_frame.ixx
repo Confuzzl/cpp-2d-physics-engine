@@ -21,7 +21,7 @@ struct frame {
   // void drawAABB(const aabb_t &aabb, const color_t &color) const;
 
   void drawMesh(const Mesh &mesh, const glm::vec2 &pos, const float rot,
-                const color_t &color) const;
+                const color_t &color, const GLenum primitive) const;
 
   void drawGrid() const;
 
