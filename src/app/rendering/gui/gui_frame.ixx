@@ -30,6 +30,7 @@ public:
                [](const window_t *w) -> const window_t & { return *w; });
   }
   auto bottomToTop() const { return topToBottom() | std::views::reverse; }
+  void handleClick();
 
   frame();
   ~frame();

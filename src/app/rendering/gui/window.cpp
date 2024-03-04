@@ -4,11 +4,15 @@ import rendering;
 import color;
 import debug;
 
-gui::interactable_t::interactable_t(const coord_t &pos, const coord_t &size)
+gui::interactable_t::interactable_t(const screen::coord_t &pos,
+                                    const screen::coord_t &size)
     : pos{pos}, size{size} {}
-bool gui::interactable_t::inBounds(const coord_t &mousePos) { return false; }
+bool gui::interactable_t::inBounds(const screen::coord_t &mousePos) {
+  return false;
+}
 
-gui::window_t::window_t(const coord_t &defaultPos, const coord_t &size)
+gui::window_t::window_t(const screen::coord_t &defaultPos,
+                        const screen::coord_t &size)
     : interactable_t(defaultPos, size), defaultPos{defaultPos} {}
 
 void gui::window_t::render() const {

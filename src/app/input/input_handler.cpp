@@ -1,11 +1,14 @@
 module;
 
 #include "util/gl.h"
+#include <algorithm>
 
 module input_handler;
 
 import app;
 import debug;
+// import gui_frame;
+import rendering;
 
 glm::ivec2 InputHandler::cursorPos{0, 0};
 std::map<int, Key> InputHandler::keys{
@@ -31,10 +34,13 @@ void InputHandler::keyCallback(GLFWwindow *window, int key, int scancode,
 }
 void InputHandler::mousePosCallback(GLFWwindow *window, double xpos,
                                     double ypos) {
-  cursorPos = {xpos, ypos};
+  cursorPos = {std::clamp<double>(xpos, 0, App::WIDTH),
+               std::clamp<double>(ypos, 0, App::HEIGHT)};
 }
 void InputHandler::mouseClickCallback(GLFWwindow *window, int button,
-                                      int action, int mods) {}
+                                      int action, int mods) {
+  // MAIN_RENDERER.guiFrame.
+}
 void InputHandler::scrollCallback(GLFWwindow *window, double xpos,
                                   double ypos) {
   static float INCREMENT = 0.1f;

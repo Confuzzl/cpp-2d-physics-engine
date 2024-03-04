@@ -155,6 +155,7 @@
     <ClCompile Include="src\gl_wrapper\texture.ixx" />
     <ClCompile Include="src\util\color.ixx" />
     <ClCompile Include="src\util\func.ixx" />
+    <ClCompile Include="src\util\screen.ixx" />
     <ClCompile Include="src\util\variant.ixx" />
     <ClCompile Include="src\util\vector.ixx" />
     <ClCompile Include="src\world\collision\aabb.ixx" />
