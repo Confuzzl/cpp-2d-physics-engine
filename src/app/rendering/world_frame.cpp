@@ -14,6 +14,7 @@ import vertices;
 import mesh;
 
 void world::frame::render() const {
+  drawGrid();
   for (const std::unique_ptr<base_obj_t> &obj : MAIN_SCENE.objs) {
     obj->draw();
   }

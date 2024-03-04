@@ -5,26 +5,28 @@ import <vector>;
 import <memory>;
 
 export namespace gui {
-// struct component {};
-struct interactable {
-  glm::u16vec2 pos;
-  glm::u16vec2 size;
+using unit_t = unsigned short;
+using coord_t = glm::u16vec2;
 
-  bool inBounds(const glm::u16vec2 &v);
+struct interactable_t {
+  coord_t pos;
+  coord_t size;
+
+  interactable_t(const coord_t &pos, const coord_t &size);
+
+  bool inBounds(const coord_t &mousePos);
 };
 
-interactable *FOCUS = nullptr;
+interactable_t *FOCUS = nullptr;
 
-struct window {
-  glm::u16vec2 defaultPos;
-  glm::u16vec2 pos;
-  glm::u16vec2 size;
+struct window_t : interactable_t {
+  coord_t defaultPos;
 
-  bool isOpen = false;
+  // bool isOpen = false;
 
   // std::vector<std::unique_ptr<component>> components{};
 
-  window(const glm::u16vec2 &defaultPos, const glm::u16vec2 &size);
+  window_t(const coord_t &defaultPos, const coord_t &size);
 
   void render() const;
   void renderTitleBar() const;

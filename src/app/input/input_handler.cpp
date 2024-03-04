@@ -7,12 +7,7 @@ module input_handler;
 import app;
 import debug;
 
-void InputHandler::processInput(const double dt) {
-  glfwPollEvents();
-  for (auto &[keycode, key] : keys)
-    key(dt);
-}
-
+glm::ivec2 InputHandler::cursorPos{0, 0};
 std::map<int, Key> InputHandler::keys{
     {GLFW_KEY_ESCAPE, {[](const double) { MAIN_APP.close(); }}},
     {GLFW_KEY_W, {Key::moveFunction(glm::vec2{0, +1})}},
@@ -21,6 +16,12 @@ std::map<int, Key> InputHandler::keys{
     {GLFW_KEY_D, {Key::moveFunction(glm::vec2{+1, 0})}},
 };
 
+void InputHandler::processInput(const double dt) {
+  glfwPollEvents();
+  for (auto &[keycode, key] : keys)
+    key(dt);
+}
+
 void InputHandler::keyCallback(GLFWwindow *window, int key, int scancode,
                                int action, int mods) {
   const auto iterator = keys.find(key);
@@ -28,8 +29,12 @@ void InputHandler::keyCallback(GLFWwindow *window, int key, int scancode,
     return;
   iterator->second.change(action);
 }
-void InputHandler::mouseCallback(GLFWwindow *window, double xpos, double ypos) {
+void InputHandler::mousePosCallback(GLFWwindow *window, double xpos,
+                                    double ypos) {
+  cursorPos = {xpos, ypos};
 }
+void InputHandler::mouseClickCallback(GLFWwindow *window, int button,
+                                      int action, int mods) {}
 void InputHandler::scrollCallback(GLFWwindow *window, double xpos,
                                   double ypos) {
   static float INCREMENT = 0.1f;

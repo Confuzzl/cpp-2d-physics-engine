@@ -28,11 +28,11 @@ export struct base_obj_t {
     float angVelocity = 0;
   };
 
-  float mass = 1;
-  glm::vec2 velocity{};
-  float angVelocity = 0;
+  float mass;
+  glm::vec2 velocity;
+  float angVelocity;
 
-  color_t color = colors::WHITE;
+  color_t color;
 
   base_obj_t(const float mass, const glm::vec2 &velocity,
              const float angVelocity, const color_t &color);
@@ -57,8 +57,8 @@ export template <> struct Object<Polygon> : base_obj_t, Polygon {
 
   static Object<Polygon> &New(const Polygon::opts_t &poly_opts,
                               const glm::vec2 pos = {0, 0}, const float r = 0,
-                              const base_obj_t::phys_opts_t &phys_opts = {},
-                              const color_t color = colors::WHITE) {
+                              const color_t color = colors::random(),
+                              const base_obj_t::phys_opts_t &phys_opts = {}) {
     std::vector<glm::vec2> vertices =
         ngonVertices(poly_opts.n, poly_opts.r, poly_opts.offset);
     Mesh mesh{
@@ -90,8 +90,8 @@ export template <> struct Object<Circle> : base_obj_t, Circle {
 
   static Object<Circle> &New(const float radius = 1,
                              const glm::vec2 &pos = {0, 0}, const float r = 0,
-                             const base_obj_t::phys_opts_t &phys_opts = {},
-                             const color_t color = colors::WHITE) {
+                             const color_t color = colors::random(),
+                             const base_obj_t::phys_opts_t &phys_opts = {}) {
     auto it = MAIN_SCENE.objs
                   .emplace(std::make_unique<Object<Circle>>(
                       pos, r, radius, phys_opts.mass, phys_opts.velocity,

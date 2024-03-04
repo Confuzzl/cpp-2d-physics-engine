@@ -12,6 +12,9 @@ import buffer_objects;
 import rendering;
 import shader;
 import texture;
+import input_handler;
+
+import <format>;
 
 gui::frame::frame() {
   // windows.emplace_back(glm::vec2{100, 100}, glm::vec2{400, 500});
@@ -19,10 +22,11 @@ gui::frame::frame() {
 gui::frame::~frame() = default;
 
 void gui::frame::render() const {
-  for (const window &window : bottomToTop()) {
+  for (const window_t &window : bottomToTop()) {
     window.render();
   }
   // text("foo");
+  text(std::format("{}", glm::to_string(InputHandler::cursorPos)));
 }
 
 static unsigned short charWidthConvert(const unsigned char w) {

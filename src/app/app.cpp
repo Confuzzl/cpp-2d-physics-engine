@@ -26,7 +26,8 @@ App::App() : loopCycle{0}, updateCycle{120}, frameCycle{60} {
   gladLoadGL();
   glViewport(0, 0, WIDTH, HEIGHT);
 
-  glfwSetCursorPosCallback(window, InputHandler::mouseCallback);
+  glfwSetCursorPosCallback(window, InputHandler::mousePosCallback);
+  glfwSetMouseButtonCallback(window, InputHandler::mouseClickCallback);
   glfwSetScrollCallback(window, InputHandler::scrollCallback);
   glfwSetKeyCallback(window, InputHandler::keyCallback);
 

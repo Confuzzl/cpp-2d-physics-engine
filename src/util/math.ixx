@@ -10,10 +10,6 @@ export template <typename T = int> T randomInt(const T a, const T b) {
   return std::uniform_int_distribution<T>{a, b}(mt);
 }
 
-export glm::u8vec3 randomColor() {
-  return {randomInt(0, 255), randomInt(0, 255), randomInt(0, 255)};
-}
-
 export int signum(const double n) { return (0 < n) - (n < 0); }
 
 import <limits>;

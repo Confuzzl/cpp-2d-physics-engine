@@ -17,17 +17,17 @@ constexpr unsigned char CHAR_WIDTH = 64, CHAR_HEIGHT = 128;
 constexpr unsigned char COLUMNS = 16, ROWS = 8;
 } // namespace font
 
-struct window;
+struct window_t;
 
 struct frame {
 private:
-  std::vector<window *> openWindows{};
+  std::vector<window_t *> openWindows{};
 
 public:
   auto topToBottom() const {
     return openWindows |
            std::views::transform(
-               [](const window *w) -> const window & { return *w; });
+               [](const window_t *w) -> const window_t & { return *w; });
   }
   auto bottomToTop() const { return topToBottom() | std::views::reverse; }
 
