@@ -24,12 +24,18 @@ private:
   std::vector<window_t *> openWindows{};
 
 public:
+  auto topToBottom() {
+    return openWindows |
+           std::views::transform([](window_t *w) -> window_t & { return *w; });
+  }
   auto topToBottom() const {
     return openWindows |
            std::views::transform(
                [](const window_t *w) -> const window_t & { return *w; });
   }
+  auto bottomToTop() { return topToBottom() | std::views::reverse; }
   auto bottomToTop() const { return topToBottom() | std::views::reverse; }
+
   void handleClick();
 
   frame();

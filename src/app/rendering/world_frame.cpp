@@ -71,7 +71,7 @@ void world::frame::drawGrid() const {
   }
   shader::basic.setView(MAIN_SCENE.camera.getView()).setFragColor(colors::GRAY);
 
-  glLineWidth(5);
+  // glLineWidth(5);
 
   glDrawArrays(GL_LINES, 0, VERTEX_COUNT);
 }
@@ -136,7 +136,7 @@ void world::frame::drawLineFixed(const glm::vec2 &a, const glm::vec2 &b,
 
   shader::basic.setView(MAIN_SCENE.camera.getView()).setFragColor(color);
 
-  glLineWidth(size);
+  // glLineWidth(size);
 
   glDrawArrays(GL_LINES, 0, 2);
 }
@@ -245,7 +245,7 @@ void world::frame::drawBoxFromToFixed(const glm::vec2 &from,
 
   shader::basic.setView(MAIN_SCENE.camera.getView()).setFragColor(color);
 
-  glLineWidth(lineSize);
+  // glLineWidth(lineSize);
 
   glDrawArrays(GL_LINE_LOOP, 0, 4);
 }

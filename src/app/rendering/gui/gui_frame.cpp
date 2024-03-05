@@ -16,9 +16,14 @@ import input_handler;
 
 import <format>;
 
-gui::frame::frame() {
-  // windows.emplace_back(glm::vec2{100, 100}, glm::vec2{400, 500});
+void gui::frame::handleClick() {
+  for (window_t &window : topToBottom()) {
+    if (window.inBounds(InputHandler::cursorPos))
+      break;
+  }
 }
+
+gui::frame::frame() {}
 gui::frame::~frame() = default;
 
 void gui::frame::render() const {

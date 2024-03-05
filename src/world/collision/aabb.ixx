@@ -4,17 +4,18 @@ import glm;
 import math;
 import <vector>;
 
-export struct aabb_t {
-  glm::vec2 min{F_INF_POS, F_INF_POS}, max{F_INF_NEG, F_INF_NEG};
+export template <typename vec_t = glm::vec2> struct aabb_t {
+  vec_t min{F_INF_POS, F_INF_POS}, max{F_INF_NEG, F_INF_NEG};
 
   aabb_t() = default;
-  aabb_t(const glm::vec2 &min, const glm::vec2 &max);
+  aabb_t(const vec_t &min, const vec_t &max) : min{min}, max{max} {}
 
-  bool intersects(const aabb_t &other) const;
-  void expand(const glm::vec2 &p);
-  void translate(const glm::vec2 &v);
+  template <typename other_vec_t>
+  bool intersects(const aabb_t<other_vec_t> &other) const;
+  void expand(const vec_t &p);
+  void translate(const vec_t &v);
 
-  static aabb_t poly_con(const glm::vec2 &pos, const float rot,
-                         const std::vector<glm::vec2> &points);
-  static aabb_t circ_con(const glm::vec2 &pos, const float radius);
+  static aabb_t poly_con(const vec_t &pos, const float rot,
+                         const std::vector<vec_t> &points);
+  static aabb_t circ_con(const vec_t &pos, const float radius);
 };

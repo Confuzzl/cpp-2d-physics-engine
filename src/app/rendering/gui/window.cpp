@@ -4,16 +4,21 @@ import rendering;
 import color;
 import debug;
 
-gui::interactable_t::interactable_t(const screen::coord_t &pos,
-                                    const screen::coord_t &size)
-    : pos{pos}, size{size} {}
-bool gui::interactable_t::inBounds(const screen::coord_t &mousePos) {
-  return false;
-}
-
 gui::window_t::window_t(const screen::coord_t &defaultPos,
                         const screen::coord_t &size)
-    : interactable_t(defaultPos, size), defaultPos{defaultPos} {}
+    : defaultPos{defaultPos}, pos{defaultPos}, size{size} {}
+
+bool gui::window_t::inBounds(const screen::coord_t &mousePos) const {
+  const screen::coord_t diff = mousePos - pos;
+  // return 0 <= diff.x && diff.x <= size.x && 0 <= diff.y && diff.y <= size.y;
+  return glm::all(glm::greaterThanEqual(diff, {})) &&
+         glm::all(glm::lessThanEqual(diff, size));
+}
+bool gui::window_t::onClick(const screen::coord_t &mousePos) {
+  if (!inBounds(mousePos))
+    return false;
+  return true;
+}
 
 void gui::window_t::render() const {
   renderTitleBar();
