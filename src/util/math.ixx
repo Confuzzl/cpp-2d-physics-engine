@@ -12,6 +12,10 @@ export template <typename T = int> T randomInt(const T a, const T b) {
 
 export int signum(const double n) { return (0 < n) - (n < 0); }
 
+export template <typename T> bool inRange(const T n, const T min, const T max) {
+  return min <= n && n <= max;
+}
+
 import <limits>;
 
 export constexpr float F_INF_POS = std::numeric_limits<float>::infinity();

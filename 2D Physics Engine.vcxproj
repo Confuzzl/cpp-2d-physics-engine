@@ -197,7 +197,6 @@
     <ClCompile Include="src\app\rendering\renderer.ixx" />
     <ClCompile Include="src\world\scene.cpp" />
     <ClCompile Include="src\world\scene.ixx" />
-    <ClCompile Include="src\world\collision\aabb.cpp" />
     <ClCompile Include="src\gl_wrapper\shader.cpp" />
     <ClCompile Include="src\gl_wrapper\shader.ixx" />
     <ClCompile Include="src\app\update_cycle.ixx" />

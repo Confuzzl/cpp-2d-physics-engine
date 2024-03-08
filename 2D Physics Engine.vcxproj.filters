@@ -138,9 +138,6 @@
     <ClCompile Include="src\world\scene.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\collision\aabb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\gl_wrapper\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
