@@ -189,6 +189,9 @@
     <ClCompile Include="src\util\screen.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\world\collision\partition\bvh\bvh.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\util\gl.h">

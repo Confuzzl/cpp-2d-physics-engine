@@ -62,13 +62,5 @@ public:
                       const color_t &color = colors::WHITE) const {
     drawQuadFromTo(min.x, min.y, max.x, max.y, color);
   }
-  // template <typename vec_t>
-  // void drawAABB(const gen_aabb_t<vec_t> &aabb,
-  //               const color_t &color = colors::WHITE) const {
-  //   drawQuadFromTo(static_cast<unsigned short>(aabb.min.x),
-  //                  static_cast<unsigned short>(aabb.min.y),
-  //                  static_cast<unsigned short>(aabb.max.x),
-  //                  static_cast<unsigned short>(aabb.max.y), color);
-  // }
 };
 } // namespace gui
