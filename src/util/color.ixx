@@ -12,6 +12,6 @@ const color_t RED{255, 0, 0}, GREEN{0, 255, 0}, BLUE{0, 0, 255};
 const color_t MAGENTA{255, 0, 255}, YELLOW{255, 255, 0}, CYAN{0, 255, 255};
 
 color_t random() {
-  return {randomInt(0u, 255u), randomInt(0u, 255u), randomInt(0u, 255u)};
+  return {random_int(0u, 255u), random_int(0u, 255u), random_int(0u, 255u)};
 }
 } // namespace colors

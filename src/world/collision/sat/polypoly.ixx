@@ -15,14 +15,14 @@ import glm;
 export namespace SAT {
 struct depth_info_t {
   const Polygon::edge_t *edge;
-  Axis axis;
+  axis_t axis;
 };
 
 enum struct PROJECTION_STATE { NONE, INTERSECTION };
 PROJECTION_STATE projectToDepths(const Polygon &a, const Polygon &b,
                                  std::vector<depth_info_t> &depths) {
   for (const Polygon::edge_t &edge : a.getEdges()) {
-    Axis axis{edge.getNormal()};
+    axis_t axis{edge.getNormal()};
     axis.projectPolygons(a, b);
     if (!axis.isIntersecting())
       return PROJECTION_STATE::NONE;

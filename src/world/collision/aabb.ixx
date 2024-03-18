@@ -21,7 +21,7 @@ export template <typename vec_t = glm::vec2> struct gen_aabb_t {
   }
   template <typename other_vec_t>
   bool contains(const other_vec_t &point) const {
-    return inRange(point.x, min.x, max.x) && inRange(point.y, min.y, max.y);
+    return in_range(point.x, min.x, max.x) && in_range(point.y, min.y, max.y);
   }
   void expand(const vec_t &p) {
     min.x = std::min(min.x, p.x);
@@ -42,6 +42,7 @@ export template <typename vec_t = glm::vec2> struct gen_aabb_t {
   unit_t height() const { return max.y - min.y; }
   vec_t size() const { return {width(), height()}; }
   unit_t area() const { return width() * height(); }
+  vec_t median() const { return min + size() / 2.0f; }
 
   static gen_aabb_t poly_con(const vec_t &pos, const float rot,
                              const std::vector<vec_t> &points) {
