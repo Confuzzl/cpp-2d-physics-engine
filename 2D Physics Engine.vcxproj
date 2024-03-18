@@ -167,7 +167,9 @@
     <ClCompile Include="src\gl_wrapper\buffer_objects.ixx" />
     <ClCompile Include="src\world\camera.cpp" />
     <ClCompile Include="src\world\camera.ixx" />
+    <ClCompile Include="src\world\collision\partition\bvh\bvh.cpp" />
     <ClCompile Include="src\world\collision\partition\bvh\bvh.ixx" />
+    <ClCompile Include="src\world\collision\partition\kdtree\kdtree.ixx" />
     <ClCompile Include="src\world\collision\partition\quadtree\quadtree.ixx" />
     <ClCompile Include="src\world\collision\sat\sat_misc.ixx" />
     <ClCompile Include="src\world\collision\shapes\circle.cpp" />

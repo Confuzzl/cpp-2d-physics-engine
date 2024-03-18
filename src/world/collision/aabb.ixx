@@ -29,6 +29,10 @@ export template <typename vec_t = glm::vec2> struct gen_aabb_t {
     min.y = std::min(min.y, p.y);
     max.y = std::max(max.y, p.y);
   }
+  void expand(const gen_aabb_t &other) {
+    expand(other.min);
+    expand(other.max);
+  }
   void translate(const vec_t &v) {
     min += v;
     max += v;
