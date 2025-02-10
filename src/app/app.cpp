@@ -1,31 +1,19 @@
 module;
 
 #include "util/gl.h"
+#include "util/main_objects.h"
+#include <stdexcept>
 
 module app;
 
 import input_handler;
 import debug;
 import gl_debug;
-import <stdexcept>;
+import rendering;
 
-App::App() : loopCycle{0}, updateCycle{120}, frameCycle{60} {
-  glfwInit();
+// const glm::vec2 App::BoundingBoxS{App::WIDTH, App::HEIGHT};
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
-  window = glfwCreateWindow(WIDTH, HEIGHT, "2D Physics Engine", NULL, NULL);
-  if (window == NULL) {
-    throw std::runtime_error{"window creation error"};
-  }
-  glfwMakeContextCurrent(window);
-
-  gladLoadGL();
-  glViewport(0, 0, WIDTH, HEIGHT);
-
+App::App() try : loopCycle{0}, inputCycle{60}, updateCycle{10}, frameCycle{60} {
   glfwSetCursorPosCallback(window, InputHandler::mousePosCallback);
   glfwSetMouseButtonCallback(window, InputHandler::mouseClickCallback);
   glfwSetScrollCallback(window, InputHandler::scrollCallback);
@@ -35,50 +23,55 @@ App::App() : loopCycle{0}, updateCycle{120}, frameCycle{60} {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_CULL_FACE);
-  // glEnable(GL_STENCIL_TEST);
-  // glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-  // glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
   glEnable(GL_DEBUG_OUTPUT);
-  glDebugMessageCallback(GL::debugCallback, 0);
-
-  cursors.init();
-  glfwSetCursor(window, cursors.ARROW);
+  glDebugMessageCallback(debugCallback, 0);
+} catch (const std::runtime_error &e) {
+  println("APP INITIALIZATION ERROR:\n{}", e.what());
 }
 App::~App() {
   println("app terminated at {:.2f}s", glfwGetTime());
+  println("min: {}\navg: {}\nmax: {}", MAIN_RENDERER.minElapsed / 1'000'000.0,
+          (MAIN_RENDERER.elapsedAccumulate / MAIN_RENDERER.elapsedCounter) /
+              1'000'000.0,
+          MAIN_RENDERER.maxElapsed / 1'000'000.0);
   glfwDestroyWindow(window);
   glfwTerminate();
 }
 
 void App::start() {
-  MAIN_RENDERER.init();
-  scene.init();
+  MAIN_SCENE.init();
+
+  updateCycle.toggle();
 
   while (!glfwWindowShouldClose(window)) {
-    double currentTime = glfwGetTime();
+    const double currentTime = glfwGetTime();
 
     loopCycle.pushNewTime(currentTime);
-    if (updateCycle.pastLength(currentTime)) {
+    if (inputCycle.isPastLength(currentTime)) {
+      inputCycle.pushNewTime(currentTime);
+      InputHandler::processInput(inputCycle.dt);
+    }
+    if (updateCycle.isPastLength(currentTime))
       startUpdate(currentTime);
-    }
-    if (frameCycle.pastLength(currentTime)) {
+    if (frameCycle.isPastLength(currentTime))
       startFrame(currentTime);
-    }
     if (currentTime - seconds >= 1) {
-      seconds++;
       loopCycle.pushCount();
       updateCycle.pushCount();
       frameCycle.pushCount();
+      seconds++;
     }
 
-    // close();
+    // if (currentTime > 60)
+    //   close();
   }
 }
 
 void App::startUpdate(const double t) {
   updateCycle.pushNewTime(t);
-  InputHandler::processInput(updateCycle.dt);
+  if (!updateCycle.locked)
+    MAIN_SCENE.update(updateCycle.dt);
 }
 void App::startFrame(const double t) {
   frameCycle.pushNewTime(t);

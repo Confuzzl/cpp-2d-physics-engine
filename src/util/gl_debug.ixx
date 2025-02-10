@@ -1,13 +1,13 @@
 module;
 
 #include "util/gl.h"
+#include <stdexcept>
 
 export module gl_debug;
 
 import debug;
 
-export namespace GL {
-std::string sourceName(GLenum source) {
+std::string sourceName(const GLenum source) {
   switch (source) {
   case GL_DEBUG_SOURCE_API:
     return "API";
@@ -22,10 +22,10 @@ std::string sourceName(GLenum source) {
   case GL_DEBUG_SOURCE_OTHER:
     return "OTHER";
   }
-  return "";
+  throw std::runtime_error{"INVALID SOURCE ENUM"};
 }
 
-std::string typeName(GLenum type) {
+std::string typeName(const GLenum type) {
   switch (type) {
   case GL_DEBUG_TYPE_ERROR:
     return "ERROR";
@@ -46,10 +46,10 @@ std::string typeName(GLenum type) {
   case GL_DEBUG_TYPE_OTHER:
     return "OTHER";
   }
-  return "";
+  throw std::runtime_error{"INVALID TYPE ENUM"};
 }
 
-std::string severityName(GLenum severity) {
+std::string severityName(const GLenum severity) {
   switch (severity) {
   case GL_DEBUG_SEVERITY_HIGH:
     return "HIGH";
@@ -60,15 +60,37 @@ std::string severityName(GLenum severity) {
   case GL_DEBUG_SEVERITY_NOTIFICATION:
     return "NOTIFICATION";
   }
-  return "";
+  throw std::runtime_error{"INVALID SEVERITY ENUM"};
 }
 
-void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id,
-                            GLenum severity, GLsizei length,
-                            const GLchar *message, const void *userParam) {
+export void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id,
+                                   GLenum severity, GLsizei length,
+                                   const GLchar *message,
+                                   const void *userParam) {
   if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
     return;
   println("source={} type={} id={} severity={} | {}", sourceName(source),
           typeName(type), id, severityName(severity), message);
 }
-} // namespace GL
+
+export std::string glGetErrorName() {
+  switch (glGetError()) {
+  case GL_NO_ERROR:
+    return "NO ERROR";
+  case GL_INVALID_ENUM:
+    return "INVALID ENUM";
+  case GL_INVALID_VALUE:
+    return "INVALID VALUE";
+  case GL_INVALID_OPERATION:
+    return "INVALID OPERATION";
+  case GL_INVALID_FRAMEBUFFER_OPERATION:
+    return "INVALID FRAMEBUFFER OPERATION";
+  case GL_OUT_OF_MEMORY:
+    return "OUT OF MEMORY";
+  case GL_STACK_UNDERFLOW:
+    return "STACK UNDERFLOW";
+  case GL_STACK_OVERFLOW:
+    return "STACK OVERFLOW";
+  }
+  throw std::runtime_error{"INVALID ERROR ENUM"};
+}

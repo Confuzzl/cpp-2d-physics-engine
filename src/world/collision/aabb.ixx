@@ -3,57 +3,102 @@ export module aabb;
 import glm;
 import math;
 import poly;
-
+import <array>;
 import <vector>;
+import debug;
 
-export template <typename vec_t = glm::vec2> struct gen_aabb_t {
-  using unit_t = vec_t::value_type;
+export struct BoundingBox {
+  glm::vec2 min{+INF, +INF}, max{-INF, -INF};
 
-  vec_t min{F_INF_POS, F_INF_POS}, max{F_INF_NEG, F_INF_NEG};
+  constexpr BoundingBox() = default;
+  constexpr BoundingBox(const glm::vec2 min, const glm::vec2 max)
+      : min{min}, max{max} {}
+  constexpr BoundingBox(const glm::vec2 max) : BoundingBox({}, max) {}
+  constexpr BoundingBox(const float radius) : min{-radius}, max{+radius} {};
+  constexpr BoundingBox(const float min, const float max)
+      : min{min}, max{max} {}
 
-  gen_aabb_t() = default;
-  gen_aabb_t(const vec_t &min, const vec_t &max) : min{min}, max{max} {}
-
-  template <typename other_vec_t>
-  bool intersects(const gen_aabb_t<other_vec_t> &other) const {
+  constexpr bool intersects(const BoundingBox &other) const {
     return (min.x < other.max.x && max.x > other.min.x) &&
            (min.y < other.max.y && max.y > other.min.y);
   }
-  template <typename other_vec_t>
-  bool contains(const other_vec_t &point) const {
+  constexpr bool contains(const glm::vec2 point) const {
     return in_range(point.x, min.x, max.x) && in_range(point.y, min.y, max.y);
   }
-  void expand(const vec_t &p) {
+  constexpr bool contains(const BoundingBox &other) const {
+    return contains(other.min) && contains(other.max);
+  }
+
+  constexpr void expand(const float padding) {
+    min -= padding;
+    max += padding;
+  }
+  constexpr void expand(const glm::vec2 p) {
     min.x = std::min(min.x, p.x);
     max.x = std::max(max.x, p.x);
     min.y = std::min(min.y, p.y);
     max.y = std::max(max.y, p.y);
   }
-  void expand(const gen_aabb_t &other) {
+  constexpr void expand(const BoundingBox &other) {
     expand(other.min);
     expand(other.max);
   }
-  void translate(const vec_t &v) {
+
+  constexpr BoundingBox operator+(const glm::vec2 v) const {
+    return {min + v, max + v};
+  }
+  constexpr BoundingBox &operator+=(const glm::vec2 v) {
     min += v;
     max += v;
+    return *this;
+  }
+  constexpr BoundingBox operator-(const glm::vec2 v) const {
+    return {min - v, max - v};
+  }
+  constexpr BoundingBox &operator-=(const glm::vec2 v) {
+    min -= v;
+    max -= v;
+    return *this;
   }
 
-  unit_t width() const { return max.x - min.x; }
-  unit_t height() const { return max.y - min.y; }
-  vec_t size() const { return {width(), height()}; }
-  unit_t area() const { return width() * height(); }
-  vec_t median() const { return min + size() / 2.0f; }
+  constexpr float height() const { return max.y - min.y; }
+  constexpr float width() const { return max.x - min.x; }
+  constexpr glm::vec2 size() const { return {width(), height()}; }
+  constexpr float area() const { return width() * height(); }
+  constexpr glm::vec2 median() const { return min + size() / 2.0f; }
 
-  static gen_aabb_t poly_con(const vec_t &pos, const float rot,
-                             const std::vector<vec_t> &points) {
-    gen_aabb_t out{};
-    for (const glm::vec2 &v : points)
-      out.expand(local_to_global(v, pos, rot));
-    return out;
+  constexpr std::array<glm::vec2, 4> toTriStrip() const {
+    // .y union access cant be constexpr?
+    return {{min, {max.x, min.y}, {min.x, max.y}, max}};
   }
-  static gen_aabb_t circ_con(const vec_t &pos, const float r) {
-    return gen_aabb_t{glm::vec2{-r, -r} + pos, glm::vec2{+r, +r} + pos};
+  constexpr std::array<glm::vec2, 4> toLineLoop() const {
+    // .y union access cant be constexpr?
+    return {{min, {max.x, min.y}, max, {min.x, max.y}}};
+  }
+
+  constexpr void reset() {
+    min = {+INF, +INF};
+    max = {-INF, -INF};
+  }
+
+  static constexpr BoundingBox startSize(const glm::vec2 start,
+                                         const glm::vec2 size) {
+    return {start, start + size};
+  }
+  static constexpr BoundingBox checked(const glm::vec2 a, const glm::vec2 b) {
+    return {
+        {std::min(a.x, b.x), std::min(a.y, b.y)},
+        {std::max(a.x, b.x), std::max(a.y, b.y)},
+    };
   }
 };
 
-export using aabb_t = gen_aabb_t<>;
+import <format>;
+
+export template <> struct std::formatter<BoundingBox> {
+  constexpr auto parse(std::format_parse_context &ctx) { return ctx.begin(); }
+  auto format(const BoundingBox &aabb, std::format_context &ctx) const {
+    return std::format_to(ctx.out(), "[{}, {}]", vec_string(aabb.min),
+                          vec_string(aabb.max));
+  }
+};

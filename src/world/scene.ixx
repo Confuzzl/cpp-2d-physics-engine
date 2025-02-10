@@ -1,22 +1,28 @@
 export module scene;
 
-import glm;
-import rendering;
 import camera;
-import <set>;
+import <map>;
 import <memory>;
+// import bvh2;
+import ecs_manager;
 
-// export struct Object;
-export struct base_obj_t;
+import hash_grid;
+import quadtree;
 
 export struct Scene {
-  Camera camera{{0, 0}, 1};
+  Camera camera{{0, 0}};
 
-  // std::set<std::unique_ptr<Object>> objects;
-  std::set<std::unique_ptr<base_obj_t>> objs{};
+  ecs::Manager ecs;
+
+  using Accel = collision::Quadtree;
+  Accel data;
 
   Scene();
-  ~Scene();
 
   void init();
+  void update(const double dt);
+
+private:
+  void updatePhysics(const float dt);
+  void updateCollisions();
 };

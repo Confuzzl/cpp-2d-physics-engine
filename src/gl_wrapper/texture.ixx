@@ -5,30 +5,32 @@ module;
 export module texture;
 
 import <string>;
-
+import glm;
 import <vector>;
+import debug;
 
-export namespace tex {
-struct texture {
-  GLuint ID = 0;
+export namespace GL {
+struct Texture {
+  GLuint ID;
+  glm::uvec2 size;
 
-  std::string path;
-  int width = -1, height = -1, channels = -1;
-
-  texture(const std::string &path) : path{path} {}
-  ~texture() { glDeleteTextures(1, &ID); }
-
-  void init();
+  Texture(const GLenum filter, const GLenum wrap);
+  Texture(const glm::uvec2 size, const GLenum filter = GL_LINEAR,
+          const GLenum wrap = GL_REPEAT);
+  Texture(const std::string &name, const GLenum filter = GL_LINEAR,
+          const GLenum wrap = GL_REPEAT);
+  ~Texture();
+  Texture(const Texture &) = delete;
+  Texture(Texture &&o);
+  Texture &operator=(const Texture &) = delete;
+  Texture &operator=(Texture &&o);
 };
+} // namespace GL
 
-inline namespace tex_storage {
-texture font{"consolas1024.png"}, gui{"gui/gui_atlas.png"};
-std::vector<texture *> textures{&font, &gui};
-
-void init() {
-  for (texture *tex : textures) {
-    tex->init();
-  }
+export template <str NAME, GLenum filter = GL_LINEAR> GL::Texture &tex() {
+  static GL::Texture out{NAME.m, filter};
+  return out;
 }
-} // namespace tex_storage
-} // namespace tex
+export GL::Texture tex(const char *name) { return {name}; }
+
+export constexpr unsigned short TEXEL_RANGE = (1 << 15) - 1;
