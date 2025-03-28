@@ -21,22 +21,25 @@ struct Physical {
     glm::vec2 acceleration;
     float mass = 1;
   } linear;
+
   struct Angular {
     float velocity = 0;
     float acceleration = 0;
     float mass = 1;
   } angular;
-};
-struct Boundable {
-  BoundingBox localBounds;
-};
-struct Collidable {
-  collision::Collider collider;
+
+  float elasticity = 1;
+
+  float frictionStatic = 0;
+  float frictionDynamic = 0;
+
+  bool gravity = true;
 };
 
-struct Renderable {
-  Mesh mesh;
-};
+using Boundable = BoundingBox;
+using Shapeable = collision::Shape;
+
+using Renderable = Mesh;
 struct DirectRenderable {
   std::function<void(BaseFrame *)> draw;
 };

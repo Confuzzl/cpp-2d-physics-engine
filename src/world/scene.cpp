@@ -25,23 +25,33 @@ static auto remove(size_t &ent,
     ECS.deleteEntity(ent);
 }
 
-// static template <typename T>
+static auto newWall(ecs::Transformable &&trans, ecs::Physical &&phys,
+                    collision::Wall &&wall) {
+  using collision::Wall;
+  using namespace ecs::comp;
+
+  const auto [v1, v2] =
+      wall.getVertices(Transformable{.rotation = trans.rotation});
+
+  phys.linear.mass = INF;
+  phys.gravity = false;
+
+  auto [id, t, p, s, b] = MAIN_SCENE.ecs.newEntity(
+      std::move(trans), std::move(phys), Shapeable{std::move(wall)},
+      Boundable::checked(v1, v2));
+  MAIN_SCENE.data.insert(id, *b + t->position);
+  return std::make_tuple(id, t, p, &std::get<Wall>(s->data), b);
+}
 static auto newCircle(ecs::Transformable &&trans, ecs::Physical &&phys,
                       const float radius) {
-  BoundingBox box{radius};
   using collision::Circle;
-  using ecs::Collidable, ecs::Boundable;
+  using namespace ecs::comp;
 
-  auto [id, t, p, c, b] =
-      MAIN_SCENE.ecs.newEntity(std::move(trans), std::move(phys),
-                               Collidable{
-                                   .collider{.data{
-                                       Circle{.radius = radius},
-                                   }},
-                               },
-                               Boundable{box});
-  MAIN_SCENE.data.insert(id, box + t->position);
-  return std::make_tuple(id, t, p, std::get_if<Circle>(&c->collider.data), b);
+  auto [id, t, p, s, b] = MAIN_SCENE.ecs.newEntity(
+      std::move(trans), std::move(phys), Shapeable{Circle{.radius = radius}},
+      Boundable{radius});
+  MAIN_SCENE.data.insert(id, *b + t->position);
+  return std::make_tuple(id, t, p, &std::get<Circle>(s->data), b);
 }
 
 Scene::Scene() : data{/*4, 8, 1 << 8*/ 2, 3, 4} {}
@@ -49,48 +59,55 @@ Scene::Scene() : data{/*4, 8, 1 << 8*/ 2, 3, 4} {}
 void Scene::init() {
   debugln(false, "SCENE INIT");
 
-  using ecs::Transformable, ecs::Physical;
+  using namespace ecs::comp;
 
-  auto [a, at, ap, ac, ab] = newCircle(
-      Transformable{
-          .position{-0.1, 0},
-          .rotation = 0,
-      },
-      Physical{
-          .linear{
-              .velocity{1, 1},
-              .mass = 1,
-          },
-          .angular{},
-      },
-      0.5);
-  auto [b, bt, bp, bc, bb] = newCircle(
-      Transformable{
-          .position{0, 0},
-          .rotation = 0,
-      },
-      Physical{
-          .linear{
-              .velocity{-1, 1},
-              .mass = 2,
-          },
-          .angular{},
-      },
-      0.5);
+  auto [a, at, ap, circle, ab] =
+      newCircle({.position{-1, 0.5}},
+                {.linear{.velocity{0, 0}, .mass = 0.5},
+                 .elasticity = 0.9f,
+                 .gravity = true},
+                0.2f);
+
+  auto [w, wt, wp, wall, wb] =
+      newWall({.position{0, 0}, .rotation = 0},
+              {.linear{.mass = 1}, .angular{}, .elasticity = 1},
+              {{1, 0}, {-1, 0}, false});
+
+  // const auto [x, y] = collision::push(*wall, *wt, *circle, *at);
+  // ecs.newEntity(DirectRenderable{.draw = [=](BaseFrame *frame) {
+  //   frame->drawDot(x, 0.02f, RED);
+  //   frame->drawDot(y, 0.02f, BLUE);
+  // }});
+
+  // auto [b, bt, bp, bc, bb] = newCircle(
+  //     Transformable{
+  //         .position{1, 0},
+  //         .rotation = 0,
+  //     },
+  //     Physical{
+  //         .linear{
+  //             .velocity{-1, 0},
+  //             .mass = 1,
+  //         },
+  //         .angular{},
+  //     },
+  //     0.5);
 
   // const auto [v1, v2] =
-  //     physics::elastic(at->position, ap->linear.velocity, ap->linear.mass,
-  //                      bt->position, bp->linear.velocity, bp->linear.mass);
+  //     physics::elastic(at->position, ap->linear.velocity,
+  //     ap->linear.mass,
+  //                      bt->position, bp->linear.velocity,
+  //                      bp->linear.mass);
   // println("{} {} {} {}", vec_string(v1), glm::length(v1), vec_string(v2),
   //         glm::length(v2));
   // ap->linear.velocity = v1;
   // bp->linear.velocity = v2;
 
-  ecs.newEntity(ecs::DirectRenderable{.draw = [=](BaseFrame *frame) {
-    const auto data = collision::push(*ac, at->position, *bc, bt->position);
-    if (data)
-      frame->drawArrow({data.a, data.b}, RED);
-  }});
+  // ecs.newEntity(ecs::DirectRenderable{.draw = [=](BaseFrame *frame) {
+  //   const auto data = collision::push(*ac, at->position, *bc,
+  //   bt->position); if (data)
+  //     frame->drawArrow({data.a, data.b}, RED);
+  // }});
 
   debugln(false, "SCENE COMPLETE\n"
                  "==================================");
@@ -110,26 +127,30 @@ void Scene::updatePhysics(const float dt) {
 
   for (auto [id, trans, phys] : ecs.viewIDComp<Transformable, Physical>()) {
     auto &[pos, rot] = *trans;
-    auto &[lin, ang] = *phys;
+    auto &[lin, ang, e, sf, df, g] = *phys;
 
-    const auto b = ecs.getComponent<Boundable>(id);
-    const bool updateTree = b && lin.velocity != glm::vec2{};
+    const auto bounds = ecs.getComponent<Boundable>(id);
+    const auto shape = ecs.getComponent<Shapeable>(id);
+    const bool updateTree =
+        bounds && (lin.velocity != glm::vec2{} || ang.velocity != 0);
 
     if (updateTree) {
-      data.remove(id, b->localBounds + pos);
+      data.remove(id, *bounds + pos);
     }
     {
       auto &[vel, acc, mass] = lin;
-      vel += acc * static_cast<float>(dt);
-      pos += vel * static_cast<float>(dt);
-    }
-    if (updateTree) {
-      data.insert(id, b->localBounds + pos);
+      if (g)
+        vel += gravity * dt;
+      vel += acc * dt;
+      pos += vel * dt;
     }
     {
       auto &[vel, acc, mass] = ang;
-      vel += acc * static_cast<float>(dt);
-      rot += vel * static_cast<float>(dt);
+      vel += acc * dt;
+      rot += vel * dt;
+    }
+    if (updateTree) {
+      data.insert(id, *bounds + pos);
     }
   }
 }
@@ -140,8 +161,7 @@ void Scene::updateCollisions() {
   std::vector<std::pair<EntID, EntID>> pairs;
   for (const auto [id, trans, bounds] :
        ecs.viewIDComp<Transformable, Boundable>()) {
-
-    const auto box = bounds->localBounds + trans->position;
+    const auto box = *bounds + trans->position;
     for (const auto [other, box] : data.queryAll(box, id)) {
       if (id < other)
         pairs.emplace_back(id, other);
@@ -159,41 +179,47 @@ void Scene::updateCollisions() {
   pairs.erase(remove.begin(), remove.end());
 
   for (const auto [a, b] : pairs) {
-    auto [at, ap, ac] =
-        ecs.getComponents<Transformable, Physical, Collidable>(a);
-    auto [bt, bp, bc] =
-        ecs.getComponents<Transformable, Physical, Collidable>(b);
+    auto [at, ap, as] =
+        ecs.getComponents<Transformable, Physical, Shapeable>(a);
+    auto [bt, bp, bs] =
+        ecs.getComponents<Transformable, Physical, Shapeable>(b);
     using namespace collision;
-    ac->collider.visit(
+    as->visit(
         [=](const Wall &a) {
-          bc->collider.visit([=](const Wall &b) {}, [=](const Circle &b) {},
-                             [=](const Polygon &b) {});
+          bs->visit(
+              [=](const Wall &b) {
+                physics::collideWallWall(a, *at, *ap, b, *bt, *bp);
+              },
+              [=](const Circle &b) {
+                physics::collideWallCirc(a, *at, *ap, b, *bt, *bp);
+              },
+              [=](const Polygon &b) {
+                physics::collideWallPoly(a, *at, *ap, b, *bt, *bp);
+              });
         },
         [=](const Circle &a) {
-          bc->collider.visit([=](const Wall &b) {},
-                             [=](const Circle &b) {
-                               const auto data = collision::push(
-                                   a, at->position, b, bt->position);
-                               if (!data)
-                                 return;
-                               // const auto total = ap->linear.mass +
-                               // bp->linear.mass; at->position += data.vec() *
-                               // (ap->linear.mass / total); bt->position -=
-                               // data.vec() * (bp->linear.mass / total); const
-                               // auto [newA, newB] = physics::elastic(
-                               //     at->position, ap->linear.velocity,
-                               //     ap->linear.mass, bt->position,
-                               //     bp->linear.velocity, bp->linear.mass);
-                               // ap->linear.velocity = newA;
-                               // bp->linear.velocity = newB;
-                               ap->linear.velocity = {};
-                               bp->linear.velocity = {};
-                             },
-                             [=](const Polygon &b) {});
+          bs->visit(
+              [=](const Wall &b) {
+                physics::collideWallCirc(b, *bt, *bp, a, *at, *ap);
+              },
+              [=](const Circle &b) {
+                physics::collideCircCirc(a, *at, *ap, b, *bt, *bp);
+              },
+              [=](const Polygon &b) {
+                physics::collideCircPoly(a, *at, *ap, b, *bt, *bp);
+              });
         },
         [=](const Polygon &a) {
-          bc->collider.visit([=](const Wall &b) {}, [=](const Circle &b) {},
-                             [=](const Polygon &b) {});
+          bs->visit(
+              [=](const Wall &b) {
+                physics::collideWallPoly(b, *bt, *bp, a, *at, *ap);
+              },
+              [=](const Circle &b) {
+                physics::collideCircPoly(b, *bt, *bp, a, *at, *ap);
+              },
+              [=](const Polygon &b) {
+                physics::collidePolyPoly(a, *at, *ap, b, *bt, *bp);
+              });
         });
   }
 }

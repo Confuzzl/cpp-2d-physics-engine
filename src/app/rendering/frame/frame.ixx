@@ -16,29 +16,32 @@ export struct BoundingBox;
 export struct BaseFrame {
   glm::mat4 matrix{1.0f};
 
-  void drawPoint(const glm::vec2 point, const float size = 10,
-                 const Color color = BLACK) const;
-  void drawPointFixed(const glm::vec2 point, const float size = 10,
-                      const Color color = BLACK) const;
+  // void drawPoint(const glm::vec2 point, const float size = 10,
+  //                const Color color = BLACK) const;
 
   void drawLinePerspective(const BoundingBox &dimensions, const float thickness,
                            const Color color = BLACK) const;
   void drawLineConstant(const BoundingBox &dimensions, const float thickness,
                         const Color color = BLACK) const;
-  void drawLine(const BoundingBox &dimensions, const Color color = BLACK) const;
+  void drawGLLine(const BoundingBox &dimensions,
+                  const Color color = BLACK) const;
 
   void drawArrow(const BoundingBox &dimensions,
                  const Color color = BLACK) const;
 
   void drawCircle(const glm::vec2 center, const float radius,
                   const Color color = BLACK) const;
+  void drawDot(const glm::vec2 center, const float radius,
+               const Color color = BLACK) const;
+  void drawGLPoint(const glm::vec2 point, const float size = 10,
+                   const Color color = BLACK) const;
 
   void drawBoxPerspective(const BoundingBox &dimensions, const float thickness,
                           const Color color = BLACK) const;
   void drawBoxConstant(const BoundingBox &dimensions, const float thickness,
                        const Color color = BLACK) const;
-
-  void drawBox(const BoundingBox &dimensions, const Color color = BLACK) const;
+  void drawBox(const BoundingBox &dimensions, const float thickness,
+               const Color color = BLACK) const;
 
   void drawQuad(const BoundingBox &dimensions, const Color color = BLACK) const;
 

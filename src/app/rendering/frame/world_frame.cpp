@@ -63,10 +63,7 @@ static void drawNode(const WorldFrame *self, const collision::Quadtree &tree,
 void WorldFrame::render() {
   matrix = MAIN_CAMERA.getView();
 
-  {
-    using namespace shaders::uniform;
-    shaders::getUBO<ViewBlock>().update({matrix});
-  }
+  shaders::getUBO<shaders::uniform::ViewBlock>().update({matrix});
 
   drawGrid();
 
@@ -82,33 +79,48 @@ void WorldFrame::render() {
 
   using namespace ecs::comp;
 
-  for (const auto [id, t, p, c] :
-       ECS.viewIDComp<Transformable, Physical, Collidable>()) {
+  for (const auto [id, t, p, s, b] :
+       ECS.viewIDComp<Transformable, Physical, Shapeable, Boundable>()) {
     const auto &trans = *t;
-    const auto &collider = c->collider;
+    const auto &shape = *s;
+    const auto &bound = *b;
 
     using namespace collision;
-    collider.visit(
-        [this, &trans, &collider](const Wall &wall) {
-          glm::vec2 points[2]{};
-          auto i = 0;
-          for (const auto p : wall.vertexTransform(trans)) {
-            points[i++] = p;
-          }
-          drawLinePerspective({points[0], points[1]}, 0.02f, BLUE);
+    const auto color = colors::random_i(id);
+    shape.visit(
+        [this, &trans, color](const Wall &wall) {
+          const auto [a, b] = wall.getVertices(trans);
+          glm::vec2 points[2]{a, b};
+          drawLinePerspective({points[0], points[1]}, 0.02f, color);
           const glm::vec2 mid = (points[0] + points[1]) / 2.0f;
-          drawLinePerspective({mid, mid + wall.normal(trans) * 0.1f}, 0.01f,
-                              BLUE);
+          const glm::vec2 norm = wall.normal(trans) * 0.1f;
+          if (wall.bidirectional)
+            drawLineConstant({mid - norm, mid + norm}, 0.01f, color);
+          else
+            drawLineConstant({mid, mid + norm}, 0.01f, color);
         },
-        [this, &trans, id](const Circle &circle) {
-          drawCircle(trans.position, circle.radius,
-                     colors::random_i(id).setAlpha(127));
+        [this, &trans, color](const Circle &circle) {
+          drawCircle(trans.position, circle.radius, color);
         },
-        [](const Polygon &polygon) {});
+        [this, &trans, color](const Polygon &polygon) {});
 
     const auto &phys = *p;
-    drawLinePerspective({trans.position, trans.position + phys.linear.velocity},
-                        0.02f, BLACK);
+    drawLineConstant({trans.position, trans.position + phys.linear.velocity},
+                     0.03f, BLACK);
+    drawLineConstant({trans.position, trans.position + phys.linear.velocity},
+                     0.01f, RED);
+
+    const auto angle =
+        glm::vec2{std::cos(trans.rotation), std::sin(trans.rotation)} * 0.2f;
+    drawLineConstant({trans.position, trans.position + angle}, 0.03f, BLACK);
+    drawLineConstant({trans.position, trans.position + angle}, 0.01f, BLUE);
+
+    drawDot(trans.position, 0.03f, BLACK);
+    drawDot(trans.position, 0.02f, color);
+
+    drawBox(bound + trans.position, 3, color);
+
+    drawGLPoint(MAIN_APP.cursorWorldPosition(), 10, BLUE);
   }
 
   for (const auto [draw] : ECS.viewComp<DirectRenderable>()) {
@@ -122,7 +134,7 @@ void WorldFrame::drawGrid() const {
 
   static constexpr unsigned int GRID_RADIUS = 4;
   static constexpr float MAJOR_LINE_SPACING = 1.0f;
-  static constexpr unsigned int MINOR_PER_MAJOR = 5;
+  static constexpr unsigned int MINOR_PER_MAJOR = 4;
   static constexpr float MINOR_LINE_SPACING =
       MAJOR_LINE_SPACING / MINOR_PER_MAJOR;
   static constexpr int NUM_HALF_MAJOR_LINES =
@@ -163,21 +175,27 @@ void WorldFrame::drawGrid() const {
     for (const glm::vec2 p : majors)
       MAJOR->write(ipos + p);
   }
-  SHADERS.line.setFragColor(LIGHTEST_GRAY)
-      .setThickness(0.005f / MAIN_CAMERA.zoom())
-      .draw(GL_LINES, MINOR);
-  SHADERS.line.setFragColor(GRAY)
-      .setThickness(0.005f / MAIN_CAMERA.zoom())
-      .draw(GL_LINES, MAJOR);
+  glLineWidth(1);
+  SHADERS.basic.setFragColor(LIGHTEST_GRAY).draw(GL_LINES, MINOR);
+  glLineWidth(2);
+  SHADERS.basic.setFragColor(GRAY).draw(GL_LINES, MAJOR);
+  // SHADERS.line.setFragColor(LIGHTEST_GRAY)
+  //     .setThickness(0.002f / MAIN_CAMERA.zoom())
+  //     .draw(GL_LINES, MINOR);
+  // SHADERS.line.setFragColor(GRAY)
+  //    .setThickness(0.005f / MAIN_CAMERA.zoom())
+  //    .draw(GL_LINES, MAJOR);
 
   const glm::vec2 axes[4]{{-NUM_HALF_MAJOR_LINES * majorSpacing + ipos.x, 0},
                           {+NUM_HALF_MAJOR_LINES * majorSpacing + ipos.x, 0},
                           {0, -NUM_HALF_MAJOR_LINES * majorSpacing + ipos.y},
                           {0, +NUM_HALF_MAJOR_LINES * majorSpacing + ipos.y}};
   VBO_4->write(axes);
-  SHADERS.line.setFragColor(BLACK)
-      .setThickness(0.01f / MAIN_CAMERA.zoom())
-      .draw(GL_LINES, VBO_4);
+  glLineWidth(4);
+  SHADERS.basic.setFragColor(BLACK).draw(GL_LINES, VBO_4);
+  // SHADERS.line.setFragColor(BLACK)
+  //     .setThickness(0.01f / MAIN_CAMERA.zoom())
+  //     .draw(GL_LINES, VBO_4);
 }
 
 void WorldFrame::drawBezier(const Bezier &curve, const Color c0, const Color c1,

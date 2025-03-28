@@ -1,14 +1,25 @@
 #version 460 core
 
-uniform vec2 center;
+layout(std140) uniform ViewBlock {
+	mat4 view;
+};
+layout(std140) uniform ScreenBlock {
+	uvec2 screen_dimensions;
+};
+
 uniform float radius;
-
-uniform vec2 screen_dimensions;
-uniform mat4 view;
-
-uniform uvec3 frag_color = uvec3(255, 255, 255);
+uniform vec2 center;
+uniform uint frag_color = 0xff;
 
 out vec4 color;
+
+vec4 rgba() {
+	const uint r = frag_color >> 24 & 0xff;
+	const uint g = frag_color >> 16 & 0xff;
+	const uint b = frag_color >> 8 & 0xff;
+	const uint a = frag_color & 0xff;
+	return vec4(r, g, b, a) / 255.0;
+}
 
 vec2 worldPosition() {
 	vec2 ndc = (gl_FragCoord.xy / screen_dimensions - 0.5) * 2.0;
@@ -17,8 +28,7 @@ vec2 worldPosition() {
 
 void main() {
 	const vec2 diff = worldPosition() - center;
-	const float d2 = diff.x * diff.x + diff.y * diff.y;
-	if (d2 > radius * radius)
+	if (dot(diff, diff) > radius * radius)
 		discard;
-	color = vec4(frag_color.xyz / 255.0, 1.0);
+	color = rgba();
 }

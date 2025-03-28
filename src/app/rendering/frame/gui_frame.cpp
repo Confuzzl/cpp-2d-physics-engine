@@ -25,6 +25,7 @@ import ubo;
 import fbo;
 import scene;
 import quadtree;
+import ecs_component;
 
 static glm::vec4 offsets() {
   return {random_float(-2.0f, 2.0f), random_float(-5.0f, 5.0f),
@@ -70,6 +71,13 @@ void GUIFrame::render() {
                    static_cast<int>(std::log2(MAIN_CAMERA.zoomExponent()))),
        BLACK, 0, 150);
   text(std::format("pos: {}", vec_string(MAIN_CAMERA.getPos())), BLACK, 0, 180);
+
+  // drawGLPoint(MAIN_APP.cursorGUIPosition(), 10, RED);
+  text(std::format("{}", vec_string(MAIN_APP.cursorWorldPosition())), BLACK, 0,
+       0);
+
+  const auto p = *ECS.getComponent<ecs::Physical>(0);
+  text(std::format("{}", p.linear.velocity.y), BLACK, 0, 300);
 
   // const auto nodeCount = MAIN_SCENE.data.nodes.size();
   // for (auto i = 0u; i < nodeCount; i++) {

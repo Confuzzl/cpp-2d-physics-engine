@@ -37,8 +37,14 @@ export struct App {
 
   void start();
   void startUpdate(const double t);
-  void processInput(const double dt);
+  // void processInput(const double dt);
   void startFrame(const double t);
 
+  void test();
+
   void close();
+
+  glm::vec2 cursorPosition();
+  glm::vec2 cursorGUIPosition();
+  glm::vec2 cursorWorldPosition();
 } MAIN_APP{};

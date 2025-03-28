@@ -13,7 +13,7 @@ import rendering;
 
 // const glm::vec2 App::BoundingBoxS{App::WIDTH, App::HEIGHT};
 
-App::App() try : loopCycle{0}, inputCycle{60}, updateCycle{10}, frameCycle{60} {
+App::App() try : loopCycle{0}, inputCycle{60}, updateCycle{60}, frameCycle{60} {
   glfwSetCursorPosCallback(window, InputHandler::mousePosCallback);
   glfwSetMouseButtonCallback(window, InputHandler::mouseClickCallback);
   glfwSetScrollCallback(window, InputHandler::scrollCallback);
@@ -62,9 +62,6 @@ void App::start() {
       frameCycle.pushCount();
       seconds++;
     }
-
-    // if (currentTime > 60)
-    //   close();
   }
 }
 
@@ -79,3 +76,27 @@ void App::startFrame(const double t) {
 }
 
 void App::close() { glfwSetWindowShouldClose(window, true); }
+
+import physics;
+
+void App::test() { physics::test(); }
+
+glm::vec2 App::cursorPosition() {
+  double x, y;
+  glfwGetCursorPos(window, &x, &y);
+  return {x, y};
+}
+glm::vec2 App::cursorGUIPosition() {
+  auto cursorPos = cursorPosition();
+  cursorPos.y = App::HEIGHT - cursorPos.y;
+  return cursorPos;
+}
+glm::vec2 App::cursorWorldPosition() {
+  auto cursorPos = cursorPosition();
+  cursorPos -= App::DIMENSIONS / 2u;
+  cursorPos.y *= -1;
+  cursorPos /= App::HEIGHT / 2;
+  cursorPos /= MAIN_CAMERA.zoom();
+  cursorPos += MAIN_CAMERA.getPos();
+  return cursorPos;
+}

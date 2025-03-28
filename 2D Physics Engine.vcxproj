@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -17,6 +17,87 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\app\app.cpp" />
+    <ClCompile Include="src\app\app.ixx" />
+    <ClCompile Include="src\app\input\input_handler.cpp" />
+    <ClCompile Include="src\app\input\input_handler.ixx" />
+    <ClCompile Include="src\app\input\key.cpp" />
+    <ClCompile Include="src\app\input\key.ixx" />
+    <ClCompile Include="src\app\rendering\bezier.ixx" />
+    <ClCompile Include="src\app\rendering\frame\frame.cpp" />
+    <ClCompile Include="src\app\rendering\frame\frame.ixx" />
+    <ClCompile Include="src\app\rendering\frame\gui_frame.cpp" />
+    <ClCompile Include="src\app\rendering\frame\gui_frame.ixx" />
+    <ClCompile Include="src\app\rendering\frame\world_frame.cpp" />
+    <ClCompile Include="src\app\rendering\frame\world_frame.ixx" />
+    <ClCompile Include="src\app\rendering\renderer.cpp" />
+    <ClCompile Include="src\app\rendering\renderer.ixx" />
+    <ClCompile Include="src\app\update_cycle.ixx" />
+    <ClCompile Include="src\app\window.ixx" />
+    <ClCompile Include="src\gl.c" />
+    <ClCompile Include="src\gl_wrapper\bo_heap.cpp" />
+    <ClCompile Include="src\gl_wrapper\bo_heap.ixx" />
+    <ClCompile Include="src\gl_wrapper\buffer_object.ixx" />
+    <ClCompile Include="src\gl_wrapper\fbo.ixx" />
+    <ClCompile Include="src\gl_wrapper\query_object.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\component\frag.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\component\geom.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\component\vert.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\program.cpp" />
+    <ClCompile Include="src\gl_wrapper\shaders\program.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\query_object.cpp" />
+    <ClCompile Include="src\gl_wrapper\shaders\shader.cpp" />
+    <ClCompile Include="src\gl_wrapper\shaders\shader.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\shaders.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\ubo.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\uniform.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\vao.ixx" />
+    <ClCompile Include="src\gl_wrapper\shaders\vertex_layout.ixx" />
+    <ClCompile Include="src\gl_wrapper\texture.cpp" />
+    <ClCompile Include="src\gl_wrapper\texture.ixx" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\util\color.ixx" />
+    <ClCompile Include="src\util\container\free_list.ixx" />
+    <ClCompile Include="src\util\container\runtime_array.ixx" />
+    <ClCompile Include="src\util\container\small_vector.ixx" />
+    <ClCompile Include="src\util\debug.ixx" />
+    <ClCompile Include="src\util\func.ixx" />
+    <ClCompile Include="src\util\glm.ixx" />
+    <ClCompile Include="src\util\gl_debug.ixx" />
+    <ClCompile Include="src\util\gl_type_macro.ixx" />
+    <ClCompile Include="src\util\math.ixx" />
+    <ClCompile Include="src\util\poly.ixx" />
+    <ClCompile Include="src\util\screen.ixx" />
+    <ClCompile Include="src\world\camera.cpp" />
+    <ClCompile Include="src\world\camera.ixx" />
+    <ClCompile Include="src\world\collision\aabb.ixx" />
+    <ClCompile Include="src\world\collision\collision.cpp" />
+    <ClCompile Include="src\world\collision\collision.ixx" />
+    <ClCompile Include="src\world\collision\generic.ixx" />
+    <ClCompile Include="src\world\collision\partitioning\bvh.cpp" />
+    <ClCompile Include="src\world\collision\partitioning\bvh.ixx" />
+    <ClCompile Include="src\world\collision\partitioning\bvh2.cpp" />
+    <ClCompile Include="src\world\collision\partitioning\bvh2.ixx" />
+    <ClCompile Include="src\world\collision\partitioning\hash_grid.ixx" />
+    <ClCompile Include="src\world\collision\partitioning\quadtree.cpp" />
+    <ClCompile Include="src\world\collision\partitioning\quadtree.ixx" />
+    <ClCompile Include="src\world\collision\physics.ixx" />
+    <ClCompile Include="src\world\collision\polycirc.ixx" />
+    <ClCompile Include="src\world\collision\sat.ixx" />
+    <ClCompile Include="src\world\collision\shapes.ixx" />
+    <ClCompile Include="src\world\ecs\component.ixx" />
+    <ClCompile Include="src\world\ecs\manager.cpp" />
+    <ClCompile Include="src\world\ecs\manager.ixx" />
+    <ClCompile Include="src\world\mesh.ixx" />
+    <ClCompile Include="src\world\scene.cpp" />
+    <ClCompile Include="src\world\scene.ixx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gl_wrapper\shaders\uniform_macro.h" />
+    <ClInclude Include="src\util\gl.h" />
+    <ClInclude Include="src\util\main_objects.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -142,71 +223,6 @@
       <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\app\cursor.cpp" />
-    <ClCompile Include="src\app\cursor.ixx" />
-    <ClCompile Include="src\app\rendering\gui\gui_frame.cpp" />
-    <ClCompile Include="src\app\rendering\gui\gui_frame.ixx" />
-    <ClCompile Include="src\app\rendering\gui\window.cpp" />
-    <ClCompile Include="src\app\rendering\gui\window.ixx" />
-    <ClCompile Include="src\app\rendering\world_frame.ixx" />
-    <ClCompile Include="src\app\rendering\world_frame.cpp" />
-    <ClCompile Include="src\gl_wrapper\texture.cpp" />
-    <ClCompile Include="src\gl_wrapper\texture.ixx" />
-    <ClCompile Include="src\util\color.ixx" />
-    <ClCompile Include="src\util\func.ixx" />
-    <ClCompile Include="src\util\screen.ixx" />
-    <ClCompile Include="src\util\variant.ixx" />
-    <ClCompile Include="src\util\vector.ixx" />
-    <ClCompile Include="src\world\collision\aabb.ixx" />
-    <ClCompile Include="src\app\app.cpp" />
-    <ClCompile Include="src\app\app.ixx" />
-    <ClCompile Include="src\app\input\input_handler.cpp" />
-    <ClCompile Include="src\app\input\key.cpp" />
-    <ClCompile Include="src\app\input\key.ixx" />
-    <ClCompile Include="src\gl_wrapper\buffer_objects.ixx" />
-    <ClCompile Include="src\world\camera.cpp" />
-    <ClCompile Include="src\world\camera.ixx" />
-    <ClCompile Include="src\world\collision\partition\bvh\bvh.ixx" />
-    <ClCompile Include="src\world\collision\partition\kdtree\kdtree.ixx" />
-    <ClCompile Include="src\world\collision\partition\quadtree\quadtree.ixx" />
-    <ClCompile Include="src\world\collision\sat\sat_misc.ixx" />
-    <ClCompile Include="src\world\collision\shapes\circle.cpp" />
-    <ClCompile Include="src\world\collision\shapes\circle.ixx" />
-    <ClCompile Include="src\world\collision\shapes\collider.cpp" />
-    <ClCompile Include="src\world\collision\shapes\collider.ixx" />
-    <ClCompile Include="src\util\debug.ixx" />
-    <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\util\glm.ixx" />
-    <ClCompile Include="src\util\gl_debug.ixx" />
-    <ClCompile Include="src\app\input\input_handler.ixx" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\world\collision\sat\axis.cpp" />
-    <ClCompile Include="src\world\collision\sat\axis.ixx" />
-    <ClCompile Include="src\world\collision\sat\circcirc.ixx" />
-    <ClCompile Include="src\world\collision\sat\polycirc.ixx" />
-    <ClCompile Include="src\world\collision\sat\polypoly.ixx" />
-    <ClCompile Include="src\world\collision\sat\query_info.ixx" />
-    <ClCompile Include="src\world\collision\sat\sat.ixx" />
-    <ClCompile Include="src\world\collision\shapes\polygon.cpp" />
-    <ClCompile Include="src\world\collision\shapes\polygon.ixx" />
-    <ClCompile Include="src\world\mesh.ixx" />
-    <ClCompile Include="src\world\object.cpp" />
-    <ClCompile Include="src\world\object.ixx" />
-    <ClCompile Include="src\util\poly.ixx" />
-    <ClCompile Include="src\util\math.ixx" />
-    <ClCompile Include="src\app\rendering\renderer.cpp" />
-    <ClCompile Include="src\app\rendering\renderer.ixx" />
-    <ClCompile Include="src\world\scene.cpp" />
-    <ClCompile Include="src\world\scene.ixx" />
-    <ClCompile Include="src\gl_wrapper\shader.cpp" />
-    <ClCompile Include="src\gl_wrapper\shader.ixx" />
-    <ClCompile Include="src\app\update_cycle.ixx" />
-    <ClCompile Include="src\gl_wrapper\vertices.ixx" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\util\gl.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

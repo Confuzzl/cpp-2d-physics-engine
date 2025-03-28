@@ -30,5 +30,7 @@ export struct Window {
     glViewport(0, 0, WIDTH, HEIGHT);
   }
 
+  bool focused() const { return glfwGetWindowAttrib(window, GLFW_FOCUSED); }
+
   operator GLFWwindow *() { return window; }
 };

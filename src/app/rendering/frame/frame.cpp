@@ -14,13 +14,13 @@ import debug;
 import fbo;
 import ubo;
 
-void BaseFrame::drawPoint(const glm::vec2 point, const float size,
-                          const Color color) const {
-  static constexpr float SCALE = 0.002f;
-  drawCircle(point, SCALE * size, color);
-}
-void BaseFrame::drawPointFixed(const glm::vec2 point, const float size,
-                               const Color color) const {
+// void BaseFrame::drawPoint(const glm::vec2 point, const float size,
+//                           const Color color) const {
+//   static constexpr float SCALE = 0.002f;
+//   drawCircle(point, SCALE * size, color);
+// }
+void BaseFrame::drawGLPoint(const glm::vec2 point, const float size,
+                            const Color color) const {
   VBO_1->write(point);
 
   glPointSize(size);
@@ -42,8 +42,8 @@ void BaseFrame::drawLineConstant(const BoundingBox &dimensions,
                                  const Color color) const {
   drawLinePerspective(dimensions, thickness / MAIN_CAMERA.zoom(), color);
 }
-void BaseFrame::drawLine(const BoundingBox &dimensions,
-                         const Color color) const {
+void BaseFrame::drawGLLine(const BoundingBox &dimensions,
+                           const Color color) const {
   const auto [from, to] = dimensions;
 
   VBO_2->write(from);
@@ -90,6 +90,10 @@ void BaseFrame::drawCircle(const glm::vec2 center, const float radius,
   SHADERS.circ.setRadius(radius).setCenter(center).setFragColor(color).draw(
       GL_POINTS, VBO_1);
 }
+void BaseFrame::drawDot(const glm::vec2 center, const float radius,
+                        const Color color) const {
+  drawCircle(center, radius / MAIN_CAMERA.zoom(), color);
+}
 
 void BaseFrame::drawBoxPerspective(const BoundingBox &dimensions,
                                    const float thickness,
@@ -108,11 +112,13 @@ void BaseFrame::drawBoxConstant(const BoundingBox &dimensions,
                                 const Color color) const {
   drawBoxPerspective(dimensions, thickness / MAIN_CAMERA.zoom(), color);
 }
-void BaseFrame::drawBox(const BoundingBox &dimensions,
+void BaseFrame::drawBox(const BoundingBox &dimensions, const float thickness,
                         const Color color) const {
   const auto [from, to] = dimensions;
 
   const auto corners = dimensions.toLineLoop();
+
+  glLineWidth(thickness);
 
   VBO_4->write(corners);
 

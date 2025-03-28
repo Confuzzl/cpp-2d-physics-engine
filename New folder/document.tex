@@ -1,0 +1,53 @@
+\documentclass[letterpaper]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[letterpaper, margin=1in]{geometry}
+
+\begin{document}
+	\begin{equation}
+		V^{AB} = V^B - V^A
+	\end{equation}
+
+	\begin{equation}
+		V^{AB} \cdot n = (V^B - V^A) \cdot n
+	\end{equation}
+
+	\begin{equation}
+		V_1 = \begin{bmatrix}x_1 \\y_1\end{bmatrix}, V_2 = \begin{bmatrix}x_2 \\y_2\end{bmatrix}
+	\end{equation}
+	\[V_1 \cdot V_2 = x_1 * x_2 + y_2 * y_2\]
+
+	\begin{equation}
+		V' = e * V
+	\end{equation}
+
+	\begin{equation}
+		V^{AB} \cdot n = -e * (V^B - V^A) \cdot n
+	\end{equation}
+
+	\begin{equation}
+		V' = V + j * n
+	\end{equation}
+
+	\begin{equation}
+		Impulse = mass * Velocity \\
+	\end{equation}
+	\[Velocity = \frac{Impulse}{mass} \therefore V' = V + \frac{j * n}{mass}\]
+
+	\begin{equation}
+		V'^A = V^A + \frac{j * n}{mass^A}
+	\end{equation}
+	\[V'^B = V^B - \frac{j * n}{mass^B}\]
+
+	\begin{equation}
+		(V^A - V^V + \frac{j * n}{mass^A} + \frac{j * n}{mass^B}) * n = -e * (V^B - V^A) \cdot n
+	\end{equation}
+	\[(V^A - V^V + \frac{j * n}{mass^A} + \frac{j * n}{mass^B}) * n + e * (V^B - V^A) \cdot n = 0\]
+
+	\begin{equation}
+		(V^B - V^A) \cdot n + j * (\frac{j * n}{mass^A} + \frac{j * n}{mass^B}) * n + e * (V^B - V^A) \cdot n = 0
+	\end{equation}
+	\[(1 + e)((V^B - V^A) \cdot n) + j * (\frac{j * n}{mass^A} + \frac{j * n}{mass^B}) * n = 0\]
+	\[j = \frac{-(1 + e)((V^B - V^A) \cdot n)}{\frac{1}{mass^A} + \frac{1}{mass^B}}\]
+\end{document}
