@@ -1,5 +1,6 @@
 module;
 
+#include <concepts>
 #include <limits>
 
 export module color;
@@ -15,7 +16,10 @@ export struct Color {
 
   constexpr Color() = default;
   constexpr Color(const Color &) = default;
+  constexpr Color &operator=(const Color &) = default;
   constexpr Color(Color &&) = default;
+  constexpr Color &operator=(Color &&) = default;
+
   template <typename T>
   constexpr Color(const T r, const T g, const T b, const T a)
       : r{static_cast<unsigned char>(r)}, g{static_cast<unsigned char>(g)},

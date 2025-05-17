@@ -17,11 +17,11 @@ import debug;
 struct HeapBufferObject;
 
 export struct BufferObjectHeapHandle {
-  HeapBufferObject *parent = nullptr;
+  HeapBufferObject *poly = nullptr;
   GLuint offset = 0, size = 0;
 
   BufferObjectHeapHandle() = default;
-  BufferObjectHeapHandle(HeapBufferObject *parent, const GLuint offset,
+  BufferObjectHeapHandle(HeapBufferObject *poly, const GLuint offset,
                          const GLuint size);
   ~BufferObjectHeapHandle();
 };
@@ -52,7 +52,7 @@ export struct VBOHeapHandleSubData : BufferObjectHeapHandle {
   GLuint count = 0, vertexSize = 0;
 
   VBOHeapHandleSubData() = default;
-  VBOHeapHandleSubData(HeapBufferObject *parent, const GLuint offset,
+  VBOHeapHandleSubData(HeapBufferObject *poly, const GLuint offset,
                        const GLuint size, const GLuint vertexSize);
 
   void writeRaw(const void *data, const GLuint size, const GLuint count);
@@ -72,17 +72,17 @@ export struct VBOHeapHandleSubData : BufferObjectHeapHandle {
 export struct VBOHeapHandleMapped : BufferObjectHeapHandle {
   GLuint count = 0, vertexSize = 0;
 
-  VBOHeapHandleMapped(HeapBufferObject *parent, const GLuint offset,
+  VBOHeapHandleMapped(HeapBufferObject *poly, const GLuint offset,
                       const GLuint size, const GLuint vertexSize);
 
   void map(const void *data, const GLuint size, const GLuint count);
   template <typename T> T *map() const {
     return static_cast<T *>(
-        glMapNamedBufferRange(parent->ID, offset, size, GL_MAP_WRITE_BIT));
+        glMapNamedBufferRange(poly->ID, offset, size, GL_MAP_WRITE_BIT));
   }
   void unmap(const GLuint count) {
     this->count = count;
-    glUnmapNamedBuffer(parent->ID);
+    glUnmapNamedBuffer(poly->ID);
   }
 
   void writeRaw(const void *data, const GLuint size, const GLuint count);
@@ -107,9 +107,13 @@ export struct EBOHeapHandle : BufferObjectHeapHandle {
   GLuint length = 0;
 
   EBOHeapHandle() = default;
-  EBOHeapHandle(HeapBufferObject *parent, const GLuint offset,
-                const GLuint size,
-                const std::initializer_list<GLuint> &indices);
+  template <typename T>
+  EBOHeapHandle(HeapBufferObject *poly, const GLuint offset,
+                const GLuint size, const T &indices)
+      : BufferObjectHeapHandle(poly, offset, size),
+        length{static_cast<GLuint>(indices.size())} {
+    glNamedBufferSubData(poly->ID, offset, size, std::data(indices));
+  }
 };
 
 using VBOHeapHandle = VBOHeapHandleMapped;
@@ -145,7 +149,30 @@ struct VertexBufferObject : ::HeapBufferObject {
 };
 
 struct ElementBufferObject : ::HeapBufferObject {
-  EBOHandle allocate(const std::initializer_list<GLuint> &indices);
+  template <typename T> EBOHandle allocate(const T &indices) {
+    const GLuint size = static_cast<GLuint>(indices.size() * sizeof(GLuint));
+    if (size > MAX_SIZE)
+      return {};
+    for (auto current = freeList.begin(); current != freeList.cend();
+         current++) {
+      if (size > current->size)
+        continue;
+
+      const auto newSize = current->size - size;
+
+      auto out =
+          std::make_unique<EBOHeapHandle>(this, current->offset, size, indices);
+
+      if (newSize == 0) {
+        freeList.erase(current);
+      } else {
+        current->offset += size;
+        current->size = newSize;
+      }
+      return out;
+    }
+    return {};
+  }
 };
 } // namespace GL
 
@@ -165,5 +192,12 @@ export struct VBOAllocator : BufferObjectAllocator<GL::VertexBufferObject> {
   }
 };
 export struct EBOAllocator : BufferObjectAllocator<GL::ElementBufferObject> {
-  EBOHandle get(const std::initializer_list<GLuint> &indices);
+  template <typename T = std::initializer_list<GLuint>>
+  EBOHandle get(const T &indices) {
+    for (auto &buffer : buffers) {
+      if (auto out = buffer.allocate(indices); out)
+        return out;
+    }
+    return buffers.emplace_back().allocate(indices);
+  }
 };

@@ -138,7 +138,7 @@ public:
   static Polygon fromUnchecked(const Transformable &t,
                                std::vector<glm::vec2> &&vertices);
 
-  const VertexView &getVertices() const { return vertexView; }
+  const VertexView &vertices() const { return vertexView; }
   const EdgeArray &getEdges() const { return edges; }
 };
 

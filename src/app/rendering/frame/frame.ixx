@@ -6,7 +6,6 @@ export module frame;
 
 import glm;
 import color;
-import collision;
 import texture;
 import mesh;
 import bezier;
@@ -55,7 +54,7 @@ export struct BaseFrame {
   void drawOutline(const BoundingBox &dimensions, const GL::Texture &texture,
                    const unsigned int radius, const Color color);
 
-  void drawMesh(const Mesh &mesh, const glm::vec2 &pos = {},
+  void drawMesh(const Mesh &mesh, const glm::vec2 pos = {},
                 const float rot = 0) const;
 
   void drawBezier(const Bezier &curve, const Color c0, const Color c1,

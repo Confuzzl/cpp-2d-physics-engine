@@ -99,12 +99,12 @@ private:
   void bind(const VBOHandle &vbo) const {
     glUseProgram(ID);
     glBindVertexArray(vao.ID);
-    glVertexArrayVertexBuffer(vao.ID, 0, vbo->parent->ID, vbo->offset,
+    glVertexArrayVertexBuffer(vao.ID, 0, vbo->poly->ID, vbo->offset,
                               static_cast<GLsizei>(vbo->vertexSize));
   }
   void bind(const VBOHandle &vbo, const EBOHandle &ebo) const {
     bind(vbo);
-    glVertexArrayElementBuffer(vao.ID, ebo->parent->ID);
+    glVertexArrayElementBuffer(vao.ID, ebo->poly->ID);
   }
 
 public:
@@ -157,7 +157,10 @@ struct Striped : SimpleProgram<vert::basic, frag::striped> {
   SET_UNIFORM_F(Width, unsigned int, width, = 1)
   SET_UNIFORM_F(Spacing, unsigned int, spacing, = 1)
   enum Pattern : unsigned int { FORWARD = 1, BACKWARD = 2, CROSS = 3 };
-  SET_UNIFORM_F(Pattern, Pattern, pattern, = FORWARD)
+  auto &setPattern(const Pattern pattern = FORWARD) {
+    setUniform(fragment.pattern, static_cast<unsigned int>(pattern));
+    return *this;
+  }
   SET_UNIFORM_F(FragColor, Color, frag_color, )
 };
 struct Bezier : SimpleProgram<vert::basic, frag::bezier> {

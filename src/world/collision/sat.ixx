@@ -1,6 +1,5 @@
 export module sat;
 
-import collision;
 import math;
 import glm;
 import <vector>;
@@ -9,6 +8,8 @@ import <algorithm>;
 import debug;
 
 export namespace collision {
+struct Polygon;
+
 namespace SAT {
 struct Axis {
   float minA = +INF, maxA = -INF;
@@ -16,6 +17,7 @@ struct Axis {
   glm::vec2 direction;
 
   Axis(const glm::vec2 direction) : direction{glm::normalize(direction)} {}
+  Axis(const float depth) : minA{0}, maxA{depth}, minB{0}, maxB{depth} {}
 
 private:
   void project(float &min, float &max, const glm::vec2 p) {
@@ -28,74 +30,32 @@ public:
   void projectA(const glm::vec2 p) { project(minA, maxA, p); }
   void projectB(const glm::vec2 p) { project(minB, maxB, p); }
 
-  float depth() const { return std::max(minA, minB) - std::min(maxA, maxB); }
-  bool intersecting() const { return depth() <= 0; }
+  float depth() const {
+    static constexpr auto contains = [](const float minA, const float maxA,
+                                        const float minB, const float maxB) {
+      return (minA < minB && minB < maxA) && (minA < maxB && maxB < maxA);
+    };
+
+    auto d = std::min(maxA, maxB) - std::max(minA, minB);
+    //  https://dyn4j.org/2010/01/sat/#sat-contain
+    if (contains(minA, maxA, minB, maxB) || contains(minB, maxB, minA, maxA)) {
+      const auto mins = std::abs(minA - minB);
+      const auto maxs = std::abs(maxA - maxB);
+      d += std::min(mins, maxs);
+    }
+    return d;
+  }
+  bool intersecting() const { return depth() > 0; }
 };
 
 struct DepthInfo {
-  const Polygon::Edge *edge;
+  const Polygon *poly = nullptr;
+  glm::vec2 normal;
   Axis axis;
 
   float depth() const { return axis.depth(); }
 };
 
-enum PROJECTION_STATE : bool { NONE, INTERSECTION };
-
-template <bool check = true> bool query(const Polygon &a, const Polygon &b) {
-  static constexpr auto project = [](const Polygon &a, const Polygon &b) {
-    for (const auto &edge : a.getEdges()) {
-      Axis axis{edge.normal()};
-      for (const auto v : a.getVertices())
-        axis.projectA(v);
-      for (const auto v : b.getVertices())
-        axis.projectB(v);
-      if (!axis.intersecting())
-        return PROJECTION_STATE::NONE;
-    }
-    return PROJECTION_STATE::INTERSECTION;
-  };
-
-  if constexpr (check)
-    if (!a.getAABB().intersects(b.getAABB()))
-      return false;
-  if (!project(a, b) || !project(b, a))
-    return false;
-  return true;
-}
-template <bool check = true>
-std::pair<glm::vec2, glm::vec2> resolve(const Polygon &a, const Polygon &b) {
-  static constexpr auto projectToDepths = [](const Polygon &a, const Polygon &b,
-                                             std::vector<DepthInfo> &depths) {
-    for (const auto &edge : a.getEdges()) {
-      Axis axis{edge.normal()};
-      for (const auto v : a.getVertices())
-        axis.projectA(v);
-      for (const auto v : b.getVertices())
-        axis.projectB(v);
-      if (!axis.intersecting())
-        return PROJECTION_STATE::NONE;
-      depths.emplace_back(&edge, std::move(axis));
-    }
-    return PROJECTION_STATE::INTERSECTION;
-  };
-
-  if constexpr (check)
-    if (!a.getAABB().intersects(b.getAABB()))
-      return {};
-
-  std::vector<DepthInfo> depths;
-  depths.reserve(a.getEdges().size() + b.getEdges().size());
-
-  if (!projectToDepths(a, b, depths) || !projectToDepths(b, a, depths))
-    return {};
-
-  // infos have negative depth so compare negative or reverse comparison
-  std::ranges::sort(depths, std::greater<float>{}, &DepthInfo::depth);
-  const DepthInfo &best = depths[0];
-
-  const glm::vec2 direction =
-      (best.edge->parent == &a ? +1.0f : -1.0f) * best.edge->normal();
-  return std::make_pair<glm::vec2, glm::vec2>(direction * best.depth(), {});
-}
+// enum PROJECTION_STATE : bool { NONE, INTERSECTION };
 } // namespace SAT
 } // namespace collision

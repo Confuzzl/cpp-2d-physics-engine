@@ -17,7 +17,7 @@ BoundingVolumeHierarchy::Node::~Node() {
   }
 }
 
-bool BoundingVolumeHierarchy::Node::isRoot() const { return !parent; }
+bool BoundingVolumeHierarchy::Node::isRoot() const { return !poly; }
 bool BoundingVolumeHierarchy::Node::isLeaf() const { return _isLeaf; }
 bool BoundingVolumeHierarchy::Node::isBranch() const {
   return !isRoot() && !isLeaf();
@@ -30,8 +30,8 @@ void BoundingVolumeHierarchy::Node::setArray(std::span<T *> objects) {
 void BoundingVolumeHierarchy::Node::setChildren(std::unique_ptr<Node> &&left,
                                                 std::unique_ptr<Node> &&right) {
   _isLeaf = false;
-  left->parent = this;
-  right->parent = this;
+  left->poly = this;
+  right->poly = this;
   this->left = std::move(left);
   this->right = std::move(right);
 }

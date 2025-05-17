@@ -6,66 +6,66 @@ module bo_heap;
 
 import debug;
 
-BufferObjectHeapHandle::BufferObjectHeapHandle(HeapBufferObject *parent,
+BufferObjectHeapHandle::BufferObjectHeapHandle(HeapBufferObject *poly,
                                                const GLuint offset,
                                                const GLuint size)
-    : parent{parent}, offset{offset}, size{size} {}
+    : poly{poly}, offset{offset}, size{size} {}
 BufferObjectHeapHandle::~BufferObjectHeapHandle() {
-  if (parent)
-    parent->free(this);
+  if (poly)
+    poly->free(this);
 }
 
-VBOHeapHandleSubData::VBOHeapHandleSubData(HeapBufferObject *parent,
+VBOHeapHandleSubData::VBOHeapHandleSubData(HeapBufferObject *poly,
                                            const GLuint offset,
                                            const GLuint size,
                                            const GLuint vertexSize)
-    : BufferObjectHeapHandle(parent, offset, size), vertexSize{vertexSize} {
+    : BufferObjectHeapHandle(poly, offset, size), vertexSize{vertexSize} {
   // auto ptr = glMapNamedBufferRange(parent->ID, offset, size,
   // GL_MAP_WRITE_BIT); glUnmapNamedBuffer(parent->ID);
 }
 void VBOHeapHandleSubData::writeRaw(const void *data, const GLuint size,
                                     const GLuint count) {
-  glNamedBufferSubData(parent->ID, offset + this->count * vertexSize, size,
+  glNamedBufferSubData(poly->ID, offset + this->count * vertexSize, size,
                        data);
   this->count += count;
   if (this->count * vertexSize > this->size)
     throw std::runtime_error{
-        std::format("Overwrite at VBO handle at VBO {}", parent->ID)};
+        std::format("Overwrite at VBO handle at VBO {}", poly->ID)};
 }
 void VBOHeapHandleSubData::reset() { count = 0; }
 
-VBOHeapHandleMapped::VBOHeapHandleMapped(HeapBufferObject *parent,
+VBOHeapHandleMapped::VBOHeapHandleMapped(HeapBufferObject *poly,
                                          const GLuint offset, const GLuint size,
                                          const GLuint vertexSize)
-    : BufferObjectHeapHandle(parent, offset, size), vertexSize{vertexSize} {}
+    : BufferObjectHeapHandle(poly, offset, size), vertexSize{vertexSize} {}
 void VBOHeapHandleMapped::map(const void *data, const GLuint size,
                               const GLuint count) {
-  auto ptr = glMapNamedBufferRange(parent->ID, offset, size, GL_MAP_WRITE_BIT);
+  auto ptr = glMapNamedBufferRange(poly->ID, offset, size, GL_MAP_WRITE_BIT);
   std::memcpy(ptr, data, size);
-  glUnmapNamedBuffer(parent->ID);
+  glUnmapNamedBuffer(poly->ID);
   this->count += count;
 }
 void VBOHeapHandleMapped::writeRaw(const void *data, const GLuint size,
                                    const GLuint count) {
-  glNamedBufferSubData(parent->ID, offset + this->count * vertexSize, size,
+  glNamedBufferSubData(poly->ID, offset + this->count * vertexSize, size,
                        data);
   this->count += count;
   if (this->count * vertexSize > this->size)
     throw std::runtime_error{
-        std::format("Overwrite at VBO handle at VBO {}", parent->ID)};
+        std::format("Overwrite at VBO handle at VBO {}", poly->ID)};
 }
 void VBOHeapHandleMapped::reset() {
   count = 0;
   // glUnmapNamedBuffer(parent->ID);
 }
 
-EBOHeapHandle::EBOHeapHandle(HeapBufferObject *parent, const GLuint offset,
-                             const GLuint size,
-                             const std::initializer_list<GLuint> &indices)
-    : BufferObjectHeapHandle(parent, offset, size),
-      length{static_cast<GLuint>(indices.size())} {
-  glNamedBufferSubData(parent->ID, offset, size, indices.begin());
-}
+// EBOHeapHandle::EBOHeapHandle(HeapBufferObject *parent, const GLuint offset,
+//                              const GLuint size,
+//                              const std::initializer_list<GLuint> &indices)
+//     : BufferObjectHeapHandle(parent, offset, size),
+//       length{static_cast<GLuint>(indices.size())} {
+//   glNamedBufferSubData(parent->ID, offset, size, std::data(indices));
+// }
 
 HeapBufferObject::HeapBufferObject()
     : GL::BufferObject(MAX_SIZE, GL_DYNAMIC_STORAGE_BIT | GL_MAP_WRITE_BIT) {}
@@ -102,35 +102,37 @@ void HeapBufferObject::coalesceRight(const free_list::iterator &block) {
   }
 }
 
-EBOHandle GL::ElementBufferObject::allocate(
-    const std::initializer_list<GLuint> &indices) {
-  const GLuint size = static_cast<GLuint>(indices.size() * sizeof(GLuint));
-  if (size > MAX_SIZE)
-    return {};
-  for (auto current = freeList.begin(); current != freeList.cend(); current++) {
-    if (size > current->size)
-      continue;
+// EBOHandle GL::ElementBufferObject::allocate(
+//     const std::initializer_list<GLuint> &indices) {
+//   const GLuint size = static_cast<GLuint>(indices.size() * sizeof(GLuint));
+//   if (size > MAX_SIZE)
+//     return {};
+//   for (auto current = freeList.begin(); current != freeList.cend();
+//   current++) {
+//     if (size > current->size)
+//       continue;
+//
+//     const auto newSize = current->size - size;
+//
+//     auto out =
+//         std::make_unique<EBOHeapHandle>(this, current->offset, size,
+//         indices);
+//
+//     if (newSize == 0) {
+//       freeList.erase(current);
+//     } else {
+//       current->offset += size;
+//       current->size = newSize;
+//     }
+//     return out;
+//   }
+//   return {};
+// }
 
-    const auto newSize = current->size - size;
-
-    auto out =
-        std::make_unique<EBOHeapHandle>(this, current->offset, size, indices);
-
-    if (newSize == 0) {
-      freeList.erase(current);
-    } else {
-      current->offset += size;
-      current->size = newSize;
-    }
-    return out;
-  }
-  return {};
-}
-
-EBOHandle EBOAllocator::get(const std::initializer_list<GLuint> &indices) {
-  for (auto &buffer : buffers) {
-    if (auto out = buffer.allocate(indices); out)
-      return out;
-  }
-  return buffers.emplace_back().allocate(indices);
-}
+// EBOHandle EBOAllocator::get(const std::initializer_list<GLuint> &indices) {
+//   for (auto &buffer : buffers) {
+//     if (auto out = buffer.allocate(indices); out)
+//       return out;
+//   }
+//   return buffers.emplace_back().allocate(indices);
+// }

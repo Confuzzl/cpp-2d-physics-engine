@@ -19,7 +19,7 @@ export namespace ecs {
 using EntID = std::size_t;
 constexpr EntID NULL_ENT = -1;
 
-constexpr std::size_t MAX_COMPONENTS = 64u;
+constexpr std::size_t MAX_COMPONENTS = 32u;
 using Signature = std::bitset<MAX_COMPONENTS>;
 
 struct GenSparseSet {
@@ -28,7 +28,7 @@ struct GenSparseSet {
 };
 template <typename T> struct SparseSet : GenSparseSet {
 private:
-  static constexpr std::size_t PAGE_SIZE = 1024;
+  static constexpr std::size_t PAGE_SIZE = 0x100;
   static constexpr std::size_t NONE = -1;
 
   using Page = std::vector<size_t>;

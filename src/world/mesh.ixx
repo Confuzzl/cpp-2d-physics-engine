@@ -1,6 +1,7 @@
 module;
 
 #include "util/gl.h"
+#include <concepts>
 
 export module mesh;
 
@@ -22,4 +23,8 @@ export struct Mesh {
   Mesh(std::vector<vertex_layout::pos> &&data, const GLenum primitive,
        const Color color)
       : data{std::move(data)}, primitive{primitive}, color{color} {}
+  Mesh(std::vector<vertex_layout::pos> &&data, EBOHandle &&ebo,
+       const GLenum primitive, const Color color)
+      : data{std::move(data)}, ebo{std::move(ebo)}, primitive{primitive},
+        color{color} {}
 };

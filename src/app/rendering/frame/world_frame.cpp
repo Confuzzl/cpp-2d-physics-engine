@@ -67,58 +67,77 @@ void WorldFrame::render() {
 
   drawGrid();
 
-  // for (const auto [id, rend] : ecs.viewComponents<ecs::Renderable>()) {
-  //   drawMesh(rend->mesh);
-  // }
-
   // const auto corner = glm::vec2{App::ASPECT_RATIO, 1.0} / MAIN_CAMERA.zoom();
   // const auto screen = BoundingBox{-corner, corner} + MAIN_CAMERA.getPos();
 
-  drawNode(this, MAIN_SCENE.data, MAIN_SCENE.data.nodes[0],
-           MAIN_SCENE.data.BOUNDS);
+  // drawGLLine({{0, 0}, {1, 0}}, RED);
+  // drawGLLine({{0, 2.0f / App::HEIGHT}, {1, 2.0f / App::HEIGHT}}, BLUE);
+  // drawGLLine({{0, 4.0f / App::HEIGHT}, {1, 4.0f / App::HEIGHT}}, RED);
+
+  // for (auto i = 0; i < 1000; i++) {
+  //   drawGLLine({{0, 2.0f * i / App::HEIGHT}, {1, 2.0f * i / App::HEIGHT}},
+  //              i % 2 == 0 ? RED : BLUE);
+  // }
+
+  // drawNode(this, MAIN_SCENE.data, MAIN_SCENE.data.nodes[0],
+  //          MAIN_SCENE.data.BOUNDS);
 
   using namespace ecs::comp;
 
-  for (const auto [id, t, p, s, b] :
-       ECS.viewIDComp<Transformable, Physical, Shapeable, Boundable>()) {
-    const auto &trans = *t;
-    const auto &shape = *s;
-    const auto &bound = *b;
+  for (const auto [id, phys, rend] : ECS.viewIDComp<Physical, Renderable>()) {
+    drawMesh(*rend, phys->position, phys->rotation);
+  }
+  // Transformable myT{.position{0, 1}, .rotation = 1.65};
+  // glm::vec2 cPos{0.1, 0.1};
+  // float cRad = 0.25;
+  // auto globalPos = transform(cPos, myT.position, myT.rotation);
+  // drawCircle(globalPos, cRad, RED);
+  // drawLineConstant(
+  //    BoundingBox::startSize(myT.position, {std::cos(myT.rotation) * 0.2f,
+  //                                          std::sin(myT.rotation) * 0.2f}),
+  //    0.03f, GREEN);
+  // drawDot(myT.position, 0.03f, BLUE);
+  // drawDot(globalPos, 0.02f, CYAN);
 
+  for (const auto [id, p, c] : ECS.viewIDComp<Physical, Collidable>()) {
     using namespace collision;
     const auto color = colors::random_i(id);
-    shape.visit(
-        [this, &trans, color](const Wall &wall) {
-          const auto [a, b] = wall.getVertices(trans);
-          glm::vec2 points[2]{a, b};
-          drawLinePerspective({points[0], points[1]}, 0.02f, color);
-          const glm::vec2 mid = (points[0] + points[1]) / 2.0f;
-          const glm::vec2 norm = wall.normal(trans) * 0.1f;
-          if (wall.bidirectional)
-            drawLineConstant({mid - norm, mid + norm}, 0.01f, color);
+    c->shape->visit(
+        [=](const Wall &wall) {
+          const Wall w = wall.transform(p->position, p->rotation);
+          const auto [a, b] = w.vertices();
+
+          drawLinePerspective({a, b}, 0.02f, color);
+
+          const glm::vec2 mid = (a + b) / 2.0f;
+          const glm::vec2 n = w.normal() * 0.1f;
+          if (w.bidirectional)
+            drawLineConstant({mid - n, mid + n}, 0.01f, color);
           else
-            drawLineConstant({mid, mid + norm}, 0.01f, color);
+            drawLineConstant({mid, mid + n}, 0.01f, color);
         },
-        [this, &trans, color](const Circle &circle) {
-          drawCircle(trans.position, circle.radius, color);
+        [=](const Circle &c) {
+          drawCircle(c.center + p->position, c.radius, color);
         },
-        [this, &trans, color](const Polygon &polygon) {});
+        [=](const Polygon &polygon) {});
 
-    const auto &phys = *p;
-    drawLineConstant({trans.position, trans.position + phys.linear.velocity},
-                     0.03f, BLACK);
-    drawLineConstant({trans.position, trans.position + phys.linear.velocity},
-                     0.01f, RED);
+    // const auto &phys = *p;
+    // drawLineConstant({p->position, p->position + phys.linear.velocity},
+    // 0.03f,
+    //                  BLACK);
+    // drawLineConstant({p->position, p->position + phys.linear.velocity},
+    // 0.01f,
+    //                  RED);
 
-    const auto angle =
-        glm::vec2{std::cos(trans.rotation), std::sin(trans.rotation)} * 0.2f;
-    drawLineConstant({trans.position, trans.position + angle}, 0.03f, BLACK);
-    drawLineConstant({trans.position, trans.position + angle}, 0.01f, BLUE);
+    // const auto angle =
+    //     glm::vec2{std::cos(p->rotation), std::sin(p->rotation)} * 0.2f;
+    // drawLineConstant({p->position, p->position + angle}, 0.03f, BLACK);
+    // drawLineConstant({p->position, p->position + angle}, 0.01f, BLUE);
 
-    drawDot(trans.position, 0.03f, BLACK);
-    drawDot(trans.position, 0.02f, color);
+    // drawDot(p->position, 0.03f, BLACK);
+    // drawDot(p->position, 0.02f, color);
 
-    drawBox(bound + trans.position, 3, color);
+    drawBox(c->bounds, 3, color);
 
     drawGLPoint(MAIN_APP.cursorWorldPosition(), 10, BLUE);
   }
@@ -175,27 +194,25 @@ void WorldFrame::drawGrid() const {
     for (const glm::vec2 p : majors)
       MAJOR->write(ipos + p);
   }
-  glLineWidth(1);
-  SHADERS.basic.setFragColor(LIGHTEST_GRAY).draw(GL_LINES, MINOR);
-  glLineWidth(2);
-  SHADERS.basic.setFragColor(GRAY).draw(GL_LINES, MAJOR);
-  // SHADERS.line.setFragColor(LIGHTEST_GRAY)
-  //     .setThickness(0.002f / MAIN_CAMERA.zoom())
-  //     .draw(GL_LINES, MINOR);
-  // SHADERS.line.setFragColor(GRAY)
-  //    .setThickness(0.005f / MAIN_CAMERA.zoom())
-  //    .draw(GL_LINES, MAJOR);
+  // glLineWidth(1);
+  // SHADERS.basic.setFragColor(LIGHTEST_GRAY).draw(GL_LINES, MINOR);
+  // glLineWidth(2);
+  // SHADERS.basic.setFragColor(GRAY).draw(GL_LINES, MAJOR);
+  SHADERS.line.setFragColor(LIGHTEST_GRAY)
+      .setThickness(0.005f / MAIN_CAMERA.zoom())
+      .draw(GL_LINES, MINOR);
+  SHADERS.line.setFragColor(GRAY)
+      .setThickness(0.005f / MAIN_CAMERA.zoom())
+      .draw(GL_LINES, MAJOR);
 
   const glm::vec2 axes[4]{{-NUM_HALF_MAJOR_LINES * majorSpacing + ipos.x, 0},
                           {+NUM_HALF_MAJOR_LINES * majorSpacing + ipos.x, 0},
                           {0, -NUM_HALF_MAJOR_LINES * majorSpacing + ipos.y},
                           {0, +NUM_HALF_MAJOR_LINES * majorSpacing + ipos.y}};
   VBO_4->write(axes);
-  glLineWidth(4);
-  SHADERS.basic.setFragColor(BLACK).draw(GL_LINES, VBO_4);
-  // SHADERS.line.setFragColor(BLACK)
-  //     .setThickness(0.01f / MAIN_CAMERA.zoom())
-  //     .draw(GL_LINES, VBO_4);
+  SHADERS.line.setFragColor(BLACK)
+      .setThickness(0.01f / MAIN_CAMERA.zoom())
+      .draw(GL_LINES, VBO_4);
 }
 
 void WorldFrame::drawBezier(const Bezier &curve, const Color c0, const Color c1,

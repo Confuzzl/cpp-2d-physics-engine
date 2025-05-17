@@ -20,7 +20,7 @@ struct BoundingVolumeHierarchy {
   static constexpr std::size_t MAX_OBJECTS_PER_LEAF = 2;
 
   struct Node {
-    Node *parent = nullptr;
+    Node *poly = nullptr;
     BoundingBox box;
 
     union {
@@ -36,7 +36,7 @@ struct BoundingVolumeHierarchy {
     ~Node();
     Node(const Node &) = delete;
     Node(Node &&that)
-        : parent{that.parent}, box{that.box}, _isLeaf{that._isLeaf},
+        : poly{that.poly}, box{that.box}, _isLeaf{that._isLeaf},
           depth{that.depth} {
       if (_isLeaf)
         array = std::move(that.array);
@@ -47,7 +47,7 @@ struct BoundingVolumeHierarchy {
     }
     Node &operator=(const Node &) = delete;
     Node &operator=(Node &&that) {
-      parent = std::move(that.parent);
+      poly = std::move(that.poly);
       box = std::move(that.box);
       _isLeaf = std::move(that._isLeaf);
       depth = std::move(that.depth);

@@ -63,7 +63,7 @@ struct SpatialHashGrid {
       for (int y = min.y; y < max.y; y++) {
         const auto &list = table.at(HASH(x) ^ HASH(y));
         for (const auto &[entID, box] : list) {
-          if (box.intersects(query))
+          if (box.touches(query))
             return true;
         }
       }
@@ -80,7 +80,7 @@ struct SpatialHashGrid {
       for (int y = min.y; y < max.y; y++) {
         const auto &list = table.at(HASH(x) ^ HASH(y));
         for (const auto &[entID, box] : list) {
-          if (box.intersects(query))
+          if (box.touches(query))
             out.emplace_back(entID, box);
         }
       }

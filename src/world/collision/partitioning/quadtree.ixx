@@ -73,23 +73,27 @@ public:
   // node list doesnt change size
   void cleanup();
 
-  bool query(const BoundingBox &box, const std::size_t exclude = -1) const;
-
 private:
-  bool query(const BoundingBox &box, const std::size_t exclude,
-             const Node &node, const BoundingBox &nodeBox) const;
+  using QueryFunc = bool (BoundingBox::*)(const BoundingBox &) const;
 
-public:
+  bool query(const BoundingBox &box, const std::size_t exclude,
+             const Node &node, const BoundingBox &nodeBox,
+             const QueryFunc func) const;
+
   // (list, min, max)
   std::tuple<small_vector<index_t>, std::size_t, std::size_t>
-  queryLeaves(const BoundingBox &box) const;
+  queryLeaves(const BoundingBox &box, const QueryFunc func) const;
   void queryLeaves(const BoundingBox &box, const Node &node,
                    const BoundingBox &nodeBox, small_vector<index_t> &list,
-                   std::size_t &min, std::size_t &max) const;
+                   std::size_t &min, std::size_t &max,
+                   const QueryFunc func) const;
 
 public:
-  small_vector<Element> queryAll(const BoundingBox &box,
-                                 const std::size_t exclude = -1) const;
+  bool query(const BoundingBox &box, const std::size_t exclude = -1,
+             const QueryFunc func = &BoundingBox::intersects) const;
+  small_vector<Element>
+  queryAll(const BoundingBox &box, const std::size_t exclude = -1,
+           const QueryFunc func = &BoundingBox::intersects) const;
 };
 } // namespace collision
 

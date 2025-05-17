@@ -118,7 +118,7 @@ void BaseFrame::drawBox(const BoundingBox &dimensions, const float thickness,
 
   const auto corners = dimensions.toLineLoop();
 
-  glLineWidth(thickness);
+  // glLineWidth(thickness);
 
   VBO_4->write(corners);
 
@@ -237,16 +237,16 @@ void BaseFrame::drawOutline(const BoundingBox &dimensions,
   drawTexture(dimensions, texture);
 }
 
-void BaseFrame::drawMesh(const Mesh &mesh, const glm::vec2 &pos,
+void BaseFrame::drawMesh(const Mesh &mesh, const glm::vec2 pos,
                          const float rot) const {
-  static constexpr auto MAX_VERTICES = 0xffff;
+  static constexpr auto MAX_VERTICES = 0x100;
   static VBOHandle VBO = VBO_HOLDER.get<>(MAX_VERTICES);
 
   VBO->write(mesh.data);
 
   SHADERS.trans.setParentPos(pos).setRotation(rot).setFragColor(mesh.color);
 
-  if (mesh.ebo->parent) {
+  if (mesh.ebo) {
     SHADERS.trans.draw(mesh.primitive, VBO, mesh.ebo);
   } else {
     SHADERS.trans.draw(mesh.primitive, VBO);

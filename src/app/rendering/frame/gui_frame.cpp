@@ -76,8 +76,8 @@ void GUIFrame::render() {
   text(std::format("{}", vec_string(MAIN_APP.cursorWorldPosition())), BLACK, 0,
        0);
 
-  const auto p = *ECS.getComponent<ecs::Physical>(0);
-  text(std::format("{}", p.linear.velocity.y), BLACK, 0, 300);
+  // const auto p = *ECS.getComponent<ecs::Physical>(0);
+  // text(std::format("{}", p.linear.velocity.y), BLACK, 0, 300);
 
   // const auto nodeCount = MAIN_SCENE.data.nodes.size();
   // for (auto i = 0u; i < nodeCount; i++) {

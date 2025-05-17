@@ -50,12 +50,12 @@ template <std::unsigned_integral T> T get(const Uniform<T> &uniform) {
   glGetUniformuiv(uniform.programID, uniform.location, &out);
   return static_cast<T>(out);
 }
-template <> float get<float>(const Uniform<float> &uniform) {
+template <> float get(const Uniform<float> &uniform) {
   GLfloat out;
   glGetUniformfv(uniform.programID, uniform.location, &out);
   return out;
 }
-template <> double get<double>(const Uniform<double> &uniform) {
+template <> double get(const Uniform<double> &uniform) {
   GLdouble out;
   glGetUniformdv(uniform.programID, uniform.location, &out);
   return out;

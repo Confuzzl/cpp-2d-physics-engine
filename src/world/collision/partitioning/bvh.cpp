@@ -105,12 +105,12 @@ void Tree::topDownRecurse(const std::size_t nodeIndex,
 Tree::obj_t *Tree::queryFirst(const BoundingBox &query,
                               const std::size_t nodeIndex) {
   const Node &node = nodes[nodeIndex];
-  if (!query.intersects(node.box))
+  if (!query.touches(node.box))
     return nullptr;
 
   if (node.isLeaf()) {
     for (obj_t &obj : getObjects(node))
-      if (obj.intersects(query))
+      if (obj.touches(query))
         return &obj;
     return nullptr;
   }
@@ -133,7 +133,7 @@ void Tree::queryAllRecurse(std::vector<Tree::obj_t *> &list,
 
   if (node.isLeaf()) {
     for (obj_t &obj : getObjects(node))
-      if (obj.intersects(query))
+      if (obj.touches(query))
         list.emplace_back(&obj);
   } else {
     queryAllRecurse(list, query, node.left);
